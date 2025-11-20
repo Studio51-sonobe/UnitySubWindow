@@ -1,0 +1,14 @@
+{
+  "name": "jp.co.studio51.subwindow",
+  "displayName": "SubWindows",
+  "version": "0.0.1",
+  "unity": "6000.1",
+  "dependencies": {
+    "com.unity.render-pipelines.universal": "17.2.0"
+  },
+  "author": {
+    "name": "sonobe yuichi",
+    "email": "sonobe.yuichi@studio51.co.jp",
+    "url": "https://github.com/Studio51-sonobe/UnitySubWindow"
+  }
+}
