@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SubWindows
 {
-	public class WindowsInputModule : BaseInputModule
+	public sealed class WindowsInputModule : BaseInputModule
 	{
 		internal int SubWindowIndex
 		{

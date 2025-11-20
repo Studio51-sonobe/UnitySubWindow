@@ -43,7 +43,10 @@ Unity のメインウィンドウ以外に別のウィンドウを生成、運�
 	- Opaque Layer Mask: Window2
 	- Transparent Layer Mask: Window2
 
-サブウィンドウ用に用意した Universal Renderer Data には Add Renderer Feature で `Flip Vertical Sync` を追加してください
+サブウィンドウ用に用意した Universal Renderer Data 以下の設定を施してください
+
+- Compatibility/Intermediate Texture: Always
+- Renderer Features/Add Renderer Feature で `Flip Vertical Sync` を追加
 
 用意した Universal Renderer Data を Universal Render Pipeline Asset に登録し、シーンビュー用をデフォルトとする
 

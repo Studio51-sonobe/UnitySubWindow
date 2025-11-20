@@ -13,6 +13,10 @@
 struct TSubWindow
 {
 	int index;
+	int x;
+	int y;
+	int width;
+	int height;
 	HWND hWnd;
 	ID3D11Texture2D *pTexture;
 	ID3D11Device *pDevice;
@@ -96,10 +100,14 @@ LRESULT CALLBACK SubWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			case WM_MOVE:
 			{
+				pWindow->x = LOWORD( lParam);
+				pWindow->y = HIWORD( lParam);
 				break;
 			}
 			case WM_SIZE:
 			{
+				pWindow->width = LOWORD( lParam);
+				pWindow->height = HIWORD( lParam);
 				break;
 			}
 			case WM_MOUSEMOVE:
@@ -211,7 +219,7 @@ void DLL_API TerminateNative()
 		s_DefaultWindowProc = NULL;
 	}
 }
-int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int width, int height, SubWindowEventCallback pCallback)
+int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int x, int y, int width, int height, SubWindowEventCallback pCallback)
 {
 	if( s_CurrentWindowHandle == NULL || s_pSubWindows == NULL || pTexture == NULL)
 	{
@@ -234,10 +242,8 @@ int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int width, int height, S
 		0,
 		SUB_WND_CLASS_NAME,
 		L"",
-		WS_DEFAULT_STYLE,
-		//WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		width, height,
+		WS_DEFAULT_STYLE, /* WS_OVERLAPPEDWINDOW, */
+		x, y, width, height,
 		s_CurrentWindowHandle, NULL,
 		hInstance,
 		NULL);
@@ -338,4 +344,32 @@ void DLL_API DisposeSubWindow( int windowIndex)
 		pWindow->hWnd = NULL;
 	}
 }
+void DLL_API MoveSubWindow( int windowIndex, int x, int y)
+{
+	if( s_pSubWindows == NULL || windowIndex < 0 || windowIndex >= s_SubWindowMaxCount)
+	{
+		return;
+	}
+	TSubWindow *pWindow = &s_pSubWindows[ windowIndex];
 
+	if( pWindow != NULL)
+	{
+		MoveWindow( pWindow->hWnd, x, y, pWindow->width, pWindow->height, TRUE);
+	}
+}
+TPoint DLL_API GetSubWindowPoint( int windowIndex)
+{
+	TPoint point = { 0, 0 };
+
+	if( s_pSubWindows != NULL && windowIndex >= 0 && windowIndex < s_SubWindowMaxCount)
+	{
+		TSubWindow *pWindow = &s_pSubWindows[ windowIndex];
+
+		if( pWindow != NULL)
+		{
+			point.x = pWindow->x;
+			point.y = pWindow->y;
+		}
+	}
+	return point;
+}

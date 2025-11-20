@@ -19,7 +19,7 @@ namespace SubWindows
 				if( renderTexture != null)
 				{
 					m_InputModule.SubWindowIndex = CreateSubWindow( renderTexture.GetNativeTexturePtr(),
-						renderTexture.width, renderTexture.height, WindowsInputModule.OnSubWindowEventCallback);
+						-1, -1, renderTexture.width, renderTexture.height, WindowsInputModule.OnSubWindowEventCallback);
 					if( m_InputModule.SubWindowIndex >= 0)
 					{
 						return true;
@@ -38,6 +38,26 @@ namespace SubWindows
 					m_InputModule.SubWindowIndex = -1;
 				}
 			}
+		}
+		public void Move( int x, int y)
+		{
+			int index = m_InputModule?.SubWindowIndex ?? -1;
+			if( index >= 0)
+			{
+				MoveSubWindow( m_InputModule.SubWindowIndex, x, y);
+			}
+		}
+		public bool TryGetPosition( out Vector2Int position)
+		{
+			int index = m_InputModule?.SubWindowIndex ?? -1;
+			if( index >= 0)
+			{
+				TPoint point = GetSubWindowPoint( index);
+				position = new Vector2Int( point.x, point.y);
+				return true;
+			}
+			position = Vector2Int.zero;
+			return false;
 		}
 		void Update()
 		{

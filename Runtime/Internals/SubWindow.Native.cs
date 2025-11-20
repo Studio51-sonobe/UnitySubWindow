@@ -15,6 +15,12 @@ namespace SubWindows
 			internal int x;
 			internal int y;
 		}
+		[StructLayout( LayoutKind.Sequential)]
+		public struct TPoint
+		{
+			internal int x;
+			internal int y;
+		}
 		[UnmanagedFunctionPointer( CallingConvention.Winapi)]
 		delegate void LogCallback( string message);
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
@@ -27,8 +33,13 @@ namespace SubWindows
 		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
 		static extern void TerminateNative();
 		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
-		static extern int CreateSubWindow( IntPtr texturePtr, int width, int height, InputEventCallback callback);
+		static extern int CreateSubWindow( IntPtr texturePtr, 
+			int x, int y, int width, int height, InputEventCallback callback);
 		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
 		static extern void DisposeSubWindow( int windowIndex);
+		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		static extern void MoveSubWindow( int windowIndex, int x, int y);
+		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		static extern TPoint GetSubWindowPoint( int windowIndex);
 	}
 }

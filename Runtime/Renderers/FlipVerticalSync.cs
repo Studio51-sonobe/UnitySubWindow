@@ -1,11 +1,11 @@
-
+﻿
 using System;
 using UnityEngine.Rendering.Universal;
 
 namespace SubWindows
 {
 	[DisallowMultipleRendererFeature( "Flip Vertical Sync")]
-	internal sealed class FlipVerticalSync : ScriptableRendererFeature
+	public sealed class FlipVerticalSync : ScriptableRendererFeature
 	{
 		public override void Create()
 		{

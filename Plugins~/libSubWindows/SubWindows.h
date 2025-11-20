@@ -17,6 +17,11 @@ struct TSubWindowEvent
     int x;
     int y;
 };
+struct TPoint
+{
+    int x;
+    int y;
+};
 #pragma pack(pop)
 
 typedef void(* LogCallback)( const char*);
@@ -27,6 +32,9 @@ DLL_EXPORT void DLL_API SetLogCallback( LogCallback logCallback);
 DLL_EXPORT void DLL_API InitializeNative( HWND hWnd, int subWindowMaxCount);
 DLL_EXPORT void DLL_API TerminateNative();
 DLL_EXPORT int DLL_API CreateSubWindow( 
-    ID3D11Texture2D *pTexture, int width, int height, 
+    ID3D11Texture2D *pTexture,
+    int x, int y, int width, int height, 
     SubWindowEventCallback pCallback);
 DLL_EXPORT void DLL_API DisposeSubWindow( int windowIndex);
+DLL_EXPORT void DLL_API MoveSubWindow( int windowIndex, int x, int y);
+DLL_EXPORT TPoint DLL_API GetSubWindowPoint( int windowIndex);

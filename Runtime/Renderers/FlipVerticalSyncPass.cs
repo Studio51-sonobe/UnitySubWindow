@@ -1,4 +1,4 @@
-
+﻿
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -7,7 +7,7 @@ using UnityEngine.Rendering.RenderGraphModule.Util;
 
 namespace SubWindows
 {
-	internal sealed class FlipVerticalSyncPass : ScriptableRenderPass
+	public sealed class FlipVerticalSyncPass : ScriptableRenderPass
 	{
 		public FlipVerticalSyncPass()
 		{
