@@ -199,7 +199,7 @@
       "dependencies": {
         "com.unity.render-pipelines.universal": "17.2.0"
       },
-      "hash": "bb5239e10d3a0a10300782527100f95278f048da"
+      "hash": "10c0d717499b1ab1e12e1fb51622d31973554258"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
