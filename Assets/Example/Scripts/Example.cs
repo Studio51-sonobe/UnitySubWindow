@@ -1,20 +1,32 @@
 ﻿
 using UnityEngine;
-using SubWindows;
+using MultiWindow;
 
 public class Example : MonoBehaviour
 {
 	[RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.BeforeSplashScreen)]
 	static void Initialize()
 	{
-		SubWindow.Initialize( 2);
+		Window.Initialize( 2);
 	}
 	void OnDestroy()
 	{
-		SubWindow.Terminate();
+		Window.Terminate();
 	}
 	void Update()
 	{
+		if( Input.GetMouseButtonDown( 2) != false)
+		{
+			m_MousePosition = Window.GetCursorPos();
+			m_WindowPosition = Window.GetMainPosition();
+		}
+		else if( Input.GetMouseButton( 2) != false)
+		{
+			Vector2Int currentPosition = Window.GetCursorPos();
+			float x = m_WindowPosition.x + (currentPosition.x - m_MousePosition.x);
+			float y = m_WindowPosition.y + (currentPosition.y - m_MousePosition.y);
+			Window.MoveMain( (int)x, (int)y);
+		}
 		if( Input.GetMouseButtonUp( 0) != false)
 		{
 			if( m_Window1.IsCreated == false)
@@ -39,8 +51,11 @@ public class Example : MonoBehaviour
 		}
 	}
 	[SerializeField]
-	SubWindow m_Window1;
+	Window m_Window1;
 	[SerializeField]
-	SubWindow m_Window2;
+	Window m_Window2;
+	
+	Vector2 m_WindowPosition;
+	Vector2Int m_MousePosition;
 }
 
