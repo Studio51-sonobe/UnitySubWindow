@@ -36,7 +36,6 @@ struct TSubWindow
 	HANDLE pThreadHandle;
 	BOOL threadKeep;
 };
-
 static LogCallback s_logCallback = NULL;
 static TMainWindow s_mainWinodw = {};
 static TSubWindow *s_pSubWindows = NULL;
@@ -319,7 +318,7 @@ int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int x, int y, int width,
 		L"",
 		WS_DEFAULT_STYLE, /* WS_OVERLAPPEDWINDOW, */
 		x, y, width, height,
-		NULL, NULL,
+		s_mainWinodw.hWnd, NULL,
 		hInstance,
 		NULL);
 

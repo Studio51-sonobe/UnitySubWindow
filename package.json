@@ -1,6 +1,6 @@
 {
-  "name": "jp.co.studio51.subwindow",
-  "displayName": "SubWindows",
+  "name": "jp.co.studio51.multiwindow",
+  "displayName": "MultiWindow",
   "version": "0.0.1",
   "unity": "2023.3",
   "dependencies": {
