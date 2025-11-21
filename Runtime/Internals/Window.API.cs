@@ -1,9 +1,9 @@
 
 using UnityEngine;
 
-namespace SubWindows
+namespace MultiWindow
 {
-	public partial class SubWindow : MonoBehaviour
+	public partial class Window : MonoBehaviour
 	{
 		public static void Initialize( int subWindowMaxCount)
 		{
@@ -20,6 +20,20 @@ namespace SubWindows
 		#if !UNITY_EDITOR && UNITY_STANDALONE_WIN
 			TerminateNative();
 		#endif
+		}
+		public static Vector2Int GetCursorPos()
+		{
+			TPoint point = GetCursorPosition();
+			return new Vector2Int( point.x, point.y);
+		}
+		public static Vector2Int GetMainPosition()
+		{
+			TPoint point = GetMainWindowPoint();
+			return new Vector2Int( point.x, point.y);
+		}
+		public static void MoveMain( int x, int y)
+		{
+			MoveMainWindow( x, y);
 		}
 	#if !UNITY_EDITOR && UNITY_STANDALONE_WIN && DEVELOPMENT_BUILD
 		static LogCallback m_LogCallback;

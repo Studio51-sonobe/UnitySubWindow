@@ -4,10 +4,10 @@ using UnityEditor;
 using UnityEngine.EventSystems;
 using System.Linq;
 
-namespace SubWindows.Editor
+namespace MultiWindow.Editor
 {
-	[CustomEditor( typeof( SubWindow), true)]
-	sealed class SubWindowEditor : UnityEditor.Editor
+	[CustomEditor( typeof( Window), true)]
+	sealed class WindowEditor : UnityEditor.Editor
 	{
 		public override void OnInspectorGUI()
 		{
@@ -25,12 +25,12 @@ namespace SubWindows.Editor
 					{
 						foreach( var target in targets)
 						{
-							if( target is SubWindow subWindow && subWindow.m_InputModule == null)
+							if( target is Window window && window.m_InputModule == null)
 							{
-								EventSystem eventSystem = subWindow.GetComponentInParent<EventSystem>();
+								EventSystem eventSystem = window.GetComponentInParent<EventSystem>();
 								if( eventSystem != null)
 								{
-									subWindow.m_InputModule = eventSystem.gameObject.AddComponent<WindowsInputModule>();
+									window.m_InputModule = eventSystem.gameObject.AddComponent<WindowInputModule>();
 									EditorGUIUtility.PingObject( eventSystem);
 								}
 								else
@@ -38,7 +38,7 @@ namespace SubWindows.Editor
 									eventSystem = FindObjectsByType<EventSystem>( FindObjectsSortMode.None).FirstOrDefault();
 									if( eventSystem != null)
 									{
-										subWindow.m_InputModule = eventSystem.gameObject.AddComponent<WindowsInputModule>();
+										window.m_InputModule = eventSystem.gameObject.AddComponent<WindowInputModule>();
 										EditorGUIUtility.PingObject( eventSystem);
 									}
 								}

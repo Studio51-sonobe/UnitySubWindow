@@ -1,56 +1,65 @@
 ﻿
 #include "pch.h"
-#include "SubWindows.h"
+#include "windows.h"
 #include <stdio.h>
 #include <windowsx.h>
 #pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dwmapi.lib")
 
 #define CS_DEFAULT_STYLE	(CS_HREDRAW | CS_VREDRAW | CS_NOCLOSE)
 #define WS_DEFAULT_STYLE	(WS_VISIBLE | WS_POPUP)
 #define WS_DEFAULT_EXSTYLE	(WS_EX_LAYERED/* | WS_EX_TRANSPARENT*/)
 #define SUB_WND_CLASS_NAME	L"UnitySubWnd"
 
+struct TMainWindow
+{
+	HWND hWnd;
+	int x;
+	int y;
+	int width;
+	int height;
+	WNDPROC defaultWndProc;
+};
 struct TSubWindow
 {
+	HWND hWnd;
 	int index;
 	int x;
 	int y;
 	int width;
 	int height;
-	HWND hWnd;
 	ID3D11Texture2D *pTexture;
 	ID3D11Device *pDevice;
 	ID3D11DeviceContext *pContext;
 	IDXGISwapChain *pSwapChain;
+	SubWindowEventCallback pCallback;
 	HANDLE pThreadHandle;
 	BOOL threadKeep;
-	SubWindowEventCallback pCallback;
 };
 
-static LogCallback s_LogCallback = NULL;
-static HWND s_CurrentWindowHandle = NULL;
-static WNDPROC s_DefaultWindowProc = NULL;
+static LogCallback s_logCallback = NULL;
+static TMainWindow s_mainWinodw = {};
 static TSubWindow *s_pSubWindows = NULL;
-static int s_SubWindowMaxCount = 0;
+static int s_subWindowMaxCount = 0;
 
 void Log( const char *p)
 {
-	if( s_LogCallback != NULL)
+	if( s_logCallback != NULL)
 	{
-		s_LogCallback(p);
+		s_logCallback(p);
 	}
 	printf(p);
 	OutputDebugStringA( p);
 }
 void DLL_API SetLogCallback( LogCallback logCallback)
 {
-	s_LogCallback = logCallback;
+	s_logCallback = logCallback;
 }
 int FindCreatableSubWindowIndex()
 {
 	TSubWindow *pWindow = NULL;
 
-	for( int i0 = 0; i0 < s_SubWindowMaxCount; ++i0)
+	for( int i0 = 0; i0 < s_subWindowMaxCount; ++i0)
 	{
 		pWindow = &s_pSubWindows[ i0];
 
@@ -65,7 +74,7 @@ TSubWindow *FindSubWindow( HWND hWnd)
 {
 	TSubWindow *pWindow = NULL;
 
-	for( int i0 = 0; i0 < s_SubWindowMaxCount; ++i0)
+	for( int i0 = 0; i0 < s_subWindowMaxCount; ++i0)
 	{
 		pWindow = &s_pSubWindows[ i0];
 
@@ -82,14 +91,18 @@ LRESULT CALLBACK MainWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_MOVE:
 		{
+			s_mainWinodw.x = LOWORD( lParam);
+			s_mainWinodw.y = HIWORD( lParam);
 			break;
 		}
 		case WM_SIZE:
 		{
+			s_mainWinodw.width = LOWORD( lParam);
+			s_mainWinodw.height = HIWORD( lParam);
 			break;
 		}
 	}
-	return CallWindowProc( s_DefaultWindowProc, hWnd, msg, wParam, lParam);
+	return CallWindowProc( s_mainWinodw.defaultWndProc, hWnd, msg, wParam, lParam);
 }
 LRESULT CALLBACK SubWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -98,6 +111,14 @@ LRESULT CALLBACK SubWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch( msg)
 		{
+			case WM_CREATE:
+			{
+				break;
+			}
+			case WM_DESTROY:
+			{
+				break;
+			}
 			case WM_MOVE:
 			{
 				pWindow->x = LOWORD( lParam);
@@ -108,6 +129,24 @@ LRESULT CALLBACK SubWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			{
 				pWindow->width = LOWORD( lParam);
 				pWindow->height = HIWORD( lParam);
+				break;
+			}
+			case WM_ENABLE:
+			{
+				break;
+			}
+			case WM_SETFOCUS:
+			{
+				break;
+			}
+			case WM_KILLFOCUS:
+			{
+				break;
+			}
+			case WM_NCHITTEST:
+			{
+				//return HTTRANSPARENT;
+				//return HTCLIENT;
 				break;
 			}
 			case WM_MOUSEMOVE:
@@ -153,42 +192,50 @@ void DLL_API InitializeNative( HWND hWnd, int subWindowMaxCount)
 {
 	if( s_pSubWindows == NULL || subWindowMaxCount > 0)
 	{
-		s_SubWindowMaxCount = subWindowMaxCount;
-		s_pSubWindows = (TSubWindow *)malloc( sizeof( TSubWindow) * s_SubWindowMaxCount);
+		s_subWindowMaxCount = subWindowMaxCount;
+		s_pSubWindows = (TSubWindow *)malloc( sizeof( TSubWindow) * s_subWindowMaxCount);
 
 		if( s_pSubWindows != NULL)
 		{
-			memset( s_pSubWindows, 0, sizeof( TSubWindow) * s_SubWindowMaxCount);
+			memset( s_pSubWindows, 0, sizeof( TSubWindow) * s_subWindowMaxCount);
 
-			for( int i0 = 0; i0 < s_SubWindowMaxCount; ++i0)
+			for( int i0 = 0; i0 < s_subWindowMaxCount; ++i0)
 			{
 				TSubWindow *pWindow = &s_pSubWindows[ i0];
 				pWindow->index = i0;
 			}
 		}
 	}
-	if( s_CurrentWindowHandle == NULL && hWnd != NULL)
+	if( s_mainWinodw.hWnd == NULL && hWnd != NULL)
 	{
-		s_CurrentWindowHandle = hWnd;
-		//s_DefaultWindowProc = (WNDPROC)SetWindowLongPtrA(
-		//	s_CurrentWindowHandle, GWLP_WNDPROC, (LONG_PTR)MainWndProc);
+		s_mainWinodw.hWnd = hWnd;
+		s_mainWinodw.defaultWndProc = (WNDPROC)SetWindowLongPtrA(
+			s_mainWinodw.hWnd, GWLP_WNDPROC, (LONG_PTR)MainWndProc);
+
+		SetWindowLongA( s_mainWinodw.hWnd, GWL_STYLE, WS_DEFAULT_STYLE);
+
+		LONG exstyle = GetWindowLongA( s_mainWinodw.hWnd, GWL_EXSTYLE);
+		exstyle |= WS_DEFAULT_EXSTYLE;
+		SetWindowLongA( s_mainWinodw.hWnd, GWL_EXSTYLE, exstyle);
+		SetWindowPos( s_mainWinodw.hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		//SetWindowPos( s_mainWinodw.hWnd, HWND_TOPMOST, 0, 0, 512, 512, SWP_NOMOVE);
 
 		//COLORREF cref = { 0 };
-		//SetLayeredWindowAttributes( s_CurrentWindowHandle, cref, 0xff, LWA_ALPHA);
+		//SetLayeredWindowAttributes( s_mainWinodw.hWnd, cref, 0, LWA_COLORKEY);
+		//SetLayeredWindowAttributes( s_mainWinodw.hWnd, cref, 0xff, LWA_COLORKEY | LWA_ALPHA);
 
 		//MARGINS margins0 = { 0, 0, 0, 0 };
-		//DwmExtendFrameIntoClientArea( s_CurrentWindowHandle, &margins0);
+		//DwmExtendFrameIntoClientArea( s_mainWinodw.hWnd, &margins0);
 
-		MARGINS margins1 = { -1 };
-		DwmExtendFrameIntoClientArea( s_CurrentWindowHandle, &margins1);
+		MARGINS margins1 = { -1, 0, 0, 0 };
+		DwmExtendFrameIntoClientArea( s_mainWinodw.hWnd, &margins1);
 
-		SetWindowLongA( s_CurrentWindowHandle, GWL_STYLE, WS_DEFAULT_STYLE);
-
-		LONG exstyle = GetWindowLongA( s_CurrentWindowHandle, GWL_EXSTYLE);
-		exstyle |= WS_DEFAULT_EXSTYLE;
-		SetWindowLongA( s_CurrentWindowHandle, GWL_EXSTYLE, exstyle);
-
-		SetWindowPos( s_CurrentWindowHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+		RECT rect;
+		GetWindowRect( s_mainWinodw.hWnd, &rect);
+		s_mainWinodw.x = rect.left;
+		s_mainWinodw.y = rect.top;
+		s_mainWinodw.width = rect.right - rect.left;
+		s_mainWinodw.height = rect.bottom - rect.top;
 
 		WNDCLASSEXW wcex;
 		memset( &wcex, 0, sizeof(wcex));
@@ -205,23 +252,51 @@ void DLL_API TerminateNative()
 {
 	if( s_pSubWindows != NULL)
 	{
-		for( int i0 = 0; i0 < s_SubWindowMaxCount; ++i0)
+		for( int i0 = 0; i0 < s_subWindowMaxCount; ++i0)
 		{
 			DisposeSubWindow( i0);
 		}
 		free( s_pSubWindows);
 		s_pSubWindows = NULL;
 	}
-	if( s_DefaultWindowProc != NULL)
+	if( s_mainWinodw.hWnd != NULL && s_mainWinodw.defaultWndProc != NULL)
 	{
-		SetWindowLongPtrA( s_CurrentWindowHandle, 
-			GWLP_WNDPROC, (LONG_PTR)s_DefaultWindowProc);
-		s_DefaultWindowProc = NULL;
+		SetWindowLongPtrA( s_mainWinodw.hWnd, 
+			GWLP_WNDPROC, (LONG_PTR)s_mainWinodw.defaultWndProc);
+		s_mainWinodw.defaultWndProc = NULL;
 	}
+}
+TPoint DLL_API GetCursorPosition()
+{
+	TPoint position = { 0, 0 };
+	POINT point;
+	
+	if( GetCursorPos( &point) != FALSE)
+	{
+		position.x = point.x;
+		position.y = point.y;
+	}
+	return position;
+}
+void DLL_API MoveMainWindow( int x, int y)
+{
+	if( s_mainWinodw.hWnd != NULL)
+	{
+		MoveWindow( s_mainWinodw.hWnd, x, y, s_mainWinodw.width, s_mainWinodw.height, TRUE);
+	}
+}
+TPoint DLL_API GetMainWindowPoint()
+{
+	TPoint point = 
+	{
+		s_mainWinodw.x, 
+		s_mainWinodw.y
+	};
+	return point;
 }
 int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int x, int y, int width, int height, SubWindowEventCallback pCallback)
 {
-	if( s_CurrentWindowHandle == NULL || s_pSubWindows == NULL || pTexture == NULL)
+	if( s_mainWinodw.hWnd == NULL || s_pSubWindows == NULL || pTexture == NULL)
 	{
 		return -1;
 	}
@@ -244,7 +319,7 @@ int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int x, int y, int width,
 		L"",
 		WS_DEFAULT_STYLE, /* WS_OVERLAPPEDWINDOW, */
 		x, y, width, height,
-		s_CurrentWindowHandle, NULL,
+		NULL, NULL,
 		hInstance,
 		NULL);
 
@@ -297,10 +372,21 @@ int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int x, int y, int width,
 			}
 			else
 			{
+				SetWindowLongA( pWindow->hWnd, GWL_STYLE, WS_DEFAULT_STYLE);
+
+				LONG exstyle = GetWindowLongA( pWindow->hWnd, GWL_EXSTYLE);
+				exstyle |= WS_DEFAULT_EXSTYLE;
+				SetWindowLongA( pWindow->hWnd, GWL_EXSTYLE, exstyle);
+				SetWindowPos( pWindow->hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+
 				ShowWindow( pWindow->hWnd, SW_SHOW);
 				pWindow->threadKeep = TRUE;
 				pWindow->pTexture = pTexture;
 				pWindow->pCallback = pCallback;
+				pWindow->x = x;
+				pWindow->y = y;
+				pWindow->width = width;
+				pWindow->height = height;
 				pWindow->pThreadHandle = CreateThread( NULL, 0, RenderThread, pWindow, 0, NULL);
 			}
 		}
@@ -309,7 +395,7 @@ int DLL_API CreateSubWindow( ID3D11Texture2D *pTexture, int x, int y, int width,
 }
 void DLL_API DisposeSubWindow( int windowIndex)
 {
-	if( s_pSubWindows == NULL || windowIndex < 0 || windowIndex >= s_SubWindowMaxCount)
+	if( s_pSubWindows == NULL || windowIndex < 0 || windowIndex >= s_subWindowMaxCount)
 	{
 		return;
 	}
@@ -346,7 +432,7 @@ void DLL_API DisposeSubWindow( int windowIndex)
 }
 void DLL_API MoveSubWindow( int windowIndex, int x, int y)
 {
-	if( s_pSubWindows == NULL || windowIndex < 0 || windowIndex >= s_SubWindowMaxCount)
+	if( s_pSubWindows == NULL || windowIndex < 0 || windowIndex >= s_subWindowMaxCount)
 	{
 		return;
 	}
@@ -361,7 +447,7 @@ TPoint DLL_API GetSubWindowPoint( int windowIndex)
 {
 	TPoint point = { 0, 0 };
 
-	if( s_pSubWindows != NULL && windowIndex >= 0 && windowIndex < s_SubWindowMaxCount)
+	if( s_pSubWindows != NULL && windowIndex >= 0 && windowIndex < s_subWindowMaxCount)
 	{
 		TSubWindow *pWindow = &s_pSubWindows[ windowIndex];
 

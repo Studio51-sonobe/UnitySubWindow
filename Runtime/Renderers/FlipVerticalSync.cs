@@ -1,10 +1,9 @@
 ﻿
-using System;
 using UnityEngine.Rendering.Universal;
 
-namespace SubWindows
+namespace MultiWindow
 {
-	[DisallowMultipleRendererFeature( "Flip Vertical Sync")]
+	[DisallowMultipleRendererFeature]
 	public sealed class FlipVerticalSync : ScriptableRendererFeature
 	{
 		public override void Create()
@@ -13,13 +12,12 @@ namespace SubWindows
 			{
 				renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing
 			};
-			m_Pass.ConfigureInput( ScriptableRenderPassInput.Color);
+			// m_Pass.ConfigureInput( ScriptableRenderPassInput.Color);
 		}
 		public override void AddRenderPasses( ScriptableRenderer renderer, ref RenderingData renderingData)
 		{
 			renderer.EnqueuePass( m_Pass);
 		}
-		[NonSerialized]
 		FlipVerticalSyncPass m_Pass;
 	}
 }

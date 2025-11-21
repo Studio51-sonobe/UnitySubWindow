@@ -5,7 +5,7 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.RenderGraphModule.Util;
 
-namespace SubWindows
+namespace MultiWindow
 {
 	public sealed class FlipVerticalSyncPass : ScriptableRenderPass
 	{
@@ -14,34 +14,42 @@ namespace SubWindows
 		}
 		public override void RecordRenderGraph( RenderGraph renderGraph, ContextContainer frameData)
 		{
-			var cameraData = frameData.Get<UniversalCameraData>();
-			
-			if( (cameraData.camera.cameraType & kInvalidCameraType) != 0)
+			try
 			{
-				return;
-			}
-			UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
-			TextureHandle cameraTexture = resourceData.activeColorTexture;
-			
-			if( cameraTexture.IsValid() != false)
-			{
-				var tempDesc = renderGraph.GetTextureDesc( cameraTexture);
-				tempDesc.name = kTempColorTarget;
-				TextureHandle tempTexture = renderGraph.CreateTexture( tempDesc);
+				var cameraData = frameData.Get<UniversalCameraData>();
 				
-				if( tempTexture.IsValid() != false)
+				if( (cameraData.camera.cameraType & kInvalidCameraType) != 0)
 				{
-					renderGraph.AddBlitPass( cameraTexture, tempTexture, new Vector2( 1.0f, -1.0f), new Vector2( 0.0f, 1.0f));
+					return;
+				}
+				UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+				TextureHandle cameraTexture = resourceData.activeColorTexture;
+				
+				if( cameraTexture.IsValid() != false)
+				{
+					var tempDesc = renderGraph.GetTextureDesc( cameraTexture);
+					tempDesc.name = kTempColorTarget;
+					TextureHandle tempTexture = renderGraph.CreateTexture( tempDesc);
 					
-					if( renderPassEvent <= RenderPassEvent.BeforeRenderingPostProcessing)
+					if( tempTexture.IsValid() != false)
 					{
-						resourceData.cameraColor = tempTexture;
-					}
-					else
-					{
-						renderGraph.AddCopyPass( tempTexture, cameraTexture);
+						renderGraph.AddBlitPass( cameraTexture, tempTexture, 
+							new Vector2( 1.0f, -1.0f), new Vector2( 0.0f, 1.0f));
+						
+						if( renderPassEvent <= RenderPassEvent.BeforeRenderingPostProcessing)
+						{
+							resourceData.cameraColor = tempTexture;
+						}
+						else
+						{
+							renderGraph.AddCopyPass( tempTexture, cameraTexture);
+						}
 					}
 				}
+			}
+			catch( System.Exception e)
+			{
+				Debug.LogError( e);
 			}
 		}
 		const CameraType kInvalidCameraType = CameraType.SceneView | CameraType.Preview;

@@ -1,4 +1,4 @@
 ﻿#if UNITY_EDITOR
 using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo( "SubWindows.Editor")]
+[assembly: InternalsVisibleTo( "MultiWindow.Editor")]
 #endif

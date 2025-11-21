@@ -3,9 +3,9 @@ using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
 
-namespace SubWindows
+namespace MultiWindow
 {
-	public partial class SubWindow : MonoBehaviour
+	public partial class Window : MonoBehaviour
 	{
 		[StructLayout( LayoutKind.Sequential)]
 		internal struct InputEvent
@@ -16,7 +16,7 @@ namespace SubWindows
 			internal int y;
 		}
 		[StructLayout( LayoutKind.Sequential)]
-		public struct TPoint
+		internal struct TPoint
 		{
 			internal int x;
 			internal int y;
@@ -26,20 +26,26 @@ namespace SubWindows
 		[UnmanagedFunctionPointer(CallingConvention.Winapi)]
 		internal delegate void InputEventCallback( InputEvent msg);
 		
-		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
 		static extern void SetLogCallback( LogCallback logCallback);
-		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
 		static extern void InitializeNative( IntPtr hWnd, int subWindowMaxCount);
-		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
 		static extern void TerminateNative();
-		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
+		static extern TPoint GetCursorPosition();
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
+		static extern void MoveMainWindow( int x, int y);
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
+		static extern TPoint GetMainWindowPoint();
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
 		static extern int CreateSubWindow( IntPtr texturePtr, 
 			int x, int y, int width, int height, InputEventCallback callback);
-		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
 		static extern void DisposeSubWindow( int windowIndex);
-		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
 		static extern void MoveSubWindow( int windowIndex, int x, int y);
-		[DllImport( "libSubWindows", CallingConvention = CallingConvention.Winapi)]
+		[DllImport( "libMultiWindow", CallingConvention = CallingConvention.Winapi)]
 		static extern TPoint GetSubWindowPoint( int windowIndex);
 	}
 }

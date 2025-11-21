@@ -2,15 +2,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SubWindows
+namespace MultiWindow
 {
-	public partial class SubWindow : MonoBehaviour
+	public partial class Window : MonoBehaviour
 	{
 		public bool IsCreated
 		{
 			get{ return m_InputModule.SubWindowIndex >= 0; }
 		}
-		public bool Create()
+		public bool Create( int x = -1, int y = -1)
 		{
 			if( m_Camera != null && m_InputModule != null && m_InputModule.SubWindowIndex < 0)
 			{
@@ -19,7 +19,7 @@ namespace SubWindows
 				if( renderTexture != null)
 				{
 					m_InputModule.SubWindowIndex = CreateSubWindow( renderTexture.GetNativeTexturePtr(),
-						-1, -1, renderTexture.width, renderTexture.height, WindowsInputModule.OnSubWindowEventCallback);
+						x, y, renderTexture.width, renderTexture.height, WindowInputModule.OnSubWindowEventCallback);
 					if( m_InputModule.SubWindowIndex >= 0)
 					{
 						return true;
@@ -61,10 +61,9 @@ namespace SubWindows
 		}
 		void Update()
 		{
-			if( m_InputModule != null && m_InputModule.SubWindowIndex >= 0
-			&&	m_Raycaster != null && m_Camera.targetTexture != null)
+			if( m_InputModule != null && m_InputModule.SubWindowIndex >= 0)
 			{
-				m_InputModule.Process( m_Raycaster, m_Camera.targetTexture);
+				m_InputModule.Process( m_Camera, m_Raycaster);
 			}
 		}
 		[SerializeField]
@@ -72,6 +71,6 @@ namespace SubWindows
 		[SerializeField]
 		GraphicRaycaster m_Raycaster;
 		[SerializeField]
-		internal WindowsInputModule m_InputModule;
+		internal WindowInputModule m_InputModule;
 	}
 }
