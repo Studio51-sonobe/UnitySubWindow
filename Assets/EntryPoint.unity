@@ -2153,7 +2153,7 @@ GameObject:
   - component: {fileID: 670530848}
   - component: {fileID: 670530849}
   m_Layer: 7
-  m_Name: Window2
+  m_Name: WindowB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3687,7 +3687,7 @@ GameObject:
   - component: {fileID: 1099357413}
   - component: {fileID: 1099357415}
   m_Layer: 6
-  m_Name: Window1
+  m_Name: WindowA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6291,8 +6291,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SubWindows::SubWindows.WindowsInputModule
   m_SendPointerHoverToParent: 1
+  m_EventSystem: {fileID: 0}
+  m_InputOverride: {fileID: 0}
+  m_DefaultInput: {fileID: 0}
+  <SubWindowIndex>k__BackingField: -1
   pixelDragThreshold: 5
   multiClickTime: 0.3
+  windowRaycaster: {fileID: 0}
+  lastLeftPressed: 0
+  lastRightPressed: 0
+  lastMiddlePressed: 0
+  injectedScrollDelta: 0
+  clickCount: 0
+  lastClickTime: 0
+  lastClickObject: {fileID: 0}
+  injectedPosition: {x: 0, y: 0}
+  hasInjectedPosition: 0
+  injectLeftDown: 0
+  injectLeftUp: 0
+  leftIsDown: 0
+  injectRightDown: 0
+  injectRightUp: 0
+  rightIsDown: 0
+  injectMiddleDown: 0
+  injectMiddleUp: 0
+  middleIsDown: 0
+  hasFocus: 1
 --- !u!114 &1813702352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6306,8 +6330,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SubWindows::SubWindows.WindowsInputModule
   m_SendPointerHoverToParent: 1
+  m_EventSystem: {fileID: 0}
+  m_InputOverride: {fileID: 0}
+  m_DefaultInput: {fileID: 0}
+  <SubWindowIndex>k__BackingField: -1
   pixelDragThreshold: 5
   multiClickTime: 0.3
+  windowRaycaster: {fileID: 0}
+  lastLeftPressed: 0
+  lastRightPressed: 0
+  lastMiddlePressed: 0
+  injectedScrollDelta: 0
+  clickCount: 0
+  lastClickTime: 0
+  lastClickObject: {fileID: 0}
+  injectedPosition: {x: 0, y: 0}
+  hasInjectedPosition: 0
+  injectLeftDown: 0
+  injectLeftUp: 0
+  leftIsDown: 0
+  injectRightDown: 0
+  injectRightUp: 0
+  rightIsDown: 0
+  injectMiddleDown: 0
+  injectMiddleUp: 0
+  middleIsDown: 0
+  hasFocus: 1
 --- !u!1 &1820366061
 GameObject:
   m_ObjectHideFlags: 0

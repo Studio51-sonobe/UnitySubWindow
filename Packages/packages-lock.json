@@ -192,14 +192,14 @@
       },
       "url": "https://packages.unity.com"
     },
-    "jp.co.studio51.subwindow": {
+    "jp.co.studio51.multiwindow": {
       "version": "https://github.com/Studio51-sonobe/UnitySubWindow.git",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.render-pipelines.universal": "17.2.0"
       },
-      "hash": "8dae449b83bf8d630c851db41e0e04c44a68d92d"
+      "hash": "0163676044ad05f4f5bf392b852da6f2d065af31"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
