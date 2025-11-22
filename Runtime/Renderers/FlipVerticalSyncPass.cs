@@ -14,42 +14,35 @@ namespace MultiWindow
 		}
 		public override void RecordRenderGraph( RenderGraph renderGraph, ContextContainer frameData)
 		{
-			try
+			var cameraData = frameData.Get<UniversalCameraData>();
+			
+			if( (cameraData.camera.cameraType & kInvalidCameraType) != 0)
 			{
-				var cameraData = frameData.Get<UniversalCameraData>();
+				return;
+			}
+			UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
+			TextureHandle cameraTexture = resourceData.activeColorTexture;
+			
+			if( cameraTexture.IsValid() != false)
+			{
+				var tempDesc = renderGraph.GetTextureDesc( cameraTexture);
+				tempDesc.name = kTempColorTarget;
+				TextureHandle tempTexture = renderGraph.CreateTexture( tempDesc);
 				
-				if( (cameraData.camera.cameraType & kInvalidCameraType) != 0)
+				if( tempTexture.IsValid() != false)
 				{
-					return;
-				}
-				UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
-				TextureHandle cameraTexture = resourceData.activeColorTexture;
-				
-				if( cameraTexture.IsValid() != false)
-				{
-					var tempDesc = renderGraph.GetTextureDesc( cameraTexture);
-					tempDesc.name = kTempColorTarget;
-					TextureHandle tempTexture = renderGraph.CreateTexture( tempDesc);
+					renderGraph.AddBlitPass( cameraTexture, tempTexture, 
+						new Vector2( 1.0f, -1.0f), new Vector2( 0.0f, 1.0f));
 					
-					if( tempTexture.IsValid() != false)
+					if( renderPassEvent <= RenderPassEvent.BeforeRenderingPostProcessing)
 					{
-						renderGraph.AddBlitPass( cameraTexture, tempTexture, 
-							new Vector2( 1.0f, -1.0f), new Vector2( 0.0f, 1.0f));
-						
-						if( renderPassEvent <= RenderPassEvent.BeforeRenderingPostProcessing)
-						{
-							resourceData.cameraColor = tempTexture;
-						}
-						else
-						{
-							renderGraph.AddCopyPass( tempTexture, cameraTexture);
-						}
+						resourceData.cameraColor = tempTexture;
+					}
+					else
+					{
+						renderGraph.AddCopyPass( tempTexture, cameraTexture);
 					}
 				}
-			}
-			catch( System.Exception e)
-			{
-				Debug.LogError( e);
 			}
 		}
 		const CameraType kInvalidCameraType = CameraType.SceneView | CameraType.Preview;

@@ -1,4 +1,4 @@
-
+﻿
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -44,6 +44,7 @@ namespace MultiWindow
 		public int pixelDragThreshold = 5;
 		public float multiClickTime = 0.3f;
 		
+		
 		GraphicRaycaster windowRaycaster;
 		PointerEventData pointerData; // single mouse pointer per window
 		readonly List<RaycastResult> raycastResults = new List<RaycastResult>();
@@ -67,6 +68,7 @@ namespace MultiWindow
 		bool middleIsDown = false;
 		readonly Queue<KeyEvent> injectedKeys = new Queue<KeyEvent>();
 		bool hasFocus = true; // whether this window currently has focus (native should update)
+		readonly Queue<char> injectedChars = new();
 		
 		struct KeyEvent
 		{
@@ -80,6 +82,10 @@ namespace MultiWindow
 		public void InjectKey( KeyCode key, bool down)
 		{
 			injectedKeys.Enqueue( new KeyEvent { key = key, down = down });
+		}
+		public void InjectChar( char c)
+		{
+			injectedChars.Enqueue( c);
 		}
 		public void InjectFocus( bool focused)
 		{
@@ -122,6 +128,51 @@ namespace MultiWindow
 					ExecuteEvents.Execute<IWindowKeyHandler>( selected, new BaseEventData( eventSystem), (handler, data) => handler.OnKey( k.key, false));
 				}
 			}
+		}
+		void ProcessInjectedChars()
+		{
+			if (injectedChars.Count == 0)
+				return;
+
+			while (injectedChars.Count > 0)
+			{
+				char c = injectedChars.Dequeue();
+				var selected = eventSystem.currentSelectedGameObject;
+				if (selected == null) continue;
+
+				// --- UnityEngine.UI.InputField ---
+				var input = selected.GetComponent<UnityEngine.UI.InputField>();
+				if (input != null)
+				{
+					input.ProcessEvent(new Event
+					{
+						type = EventType.KeyDown,
+						character = c
+					});
+					continue;
+				}
+
+				// --- TMP_InputField ---
+		#if TMP_PRESENT
+				var tmp = selected.GetComponent<TMPro.TMP_InputField>();
+				if (tmp != null)
+				{
+					tmp.ProcessEvent(Event.KeyboardEvent(c.ToString()));
+					continue;
+				}
+		#endif
+
+				// その他の UI にも通知したい場合
+				ExecuteEvents.Execute<IWindowCharHandler>(
+					selected,
+					new BaseEventData(eventSystem),
+					(h, _) => h.OnChar(c));
+			}
+		}
+
+		public interface IWindowCharHandler : IEventSystemHandler
+		{
+			void OnChar(char c);
 		}
 		void ProcessPointerDown( PointerEventData.InputButton button, PointerEventData ped, List<RaycastResult> results)
 		{
@@ -264,6 +315,7 @@ namespace MultiWindow
 				ProcessPointerUp( PointerEventData.InputButton.Middle, pointerData, raycastResults);
 			}
 			ProcessInjectedKeys();
+			ProcessInjectedChars();
 		}
 		void LateUpdate()
 		{
@@ -347,6 +399,31 @@ namespace MultiWindow
 					case 0x0208: /* WM_MBUTTONUP */
 					{
 						injectMiddleUp = true;
+						break;
+					}
+					case 0x20a: /* WM_MOUSEWHEEL */
+					{
+						InjectScroll( ev.w / 120.0f);
+						break;
+					}
+					case 0x0100: /* WM_KEYDOWN */
+					{
+						InjectKey( (KeyCode)ev.x, true);
+						break;
+					}
+					case 0x0101: /* WM_KEYUP */
+					{
+						InjectKey( (KeyCode)ev.x, true);
+						break;
+					}
+					case 0x0102: /* WM_CHAR */
+					{
+						InjectChar( (char)ev.x);
+						break;
+					}
+					case 0x0281: /* WM_IME_CHAR */
+					{
+						InjectChar( (char)ev.x);
 						break;
 					}
 				}

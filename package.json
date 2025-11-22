@@ -1,8 +1,8 @@
 {
   "name": "jp.co.studio51.multiwindow",
-  "displayName": "MultiWindow",
+  "displayName": "Multi Window",
   "version": "0.0.1",
-  "unity": "2023.3",
+  "unity": "6000.1",
   "dependencies": {
     "com.unity.render-pipelines.universal": "17.2.0"
   },

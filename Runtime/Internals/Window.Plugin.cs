@@ -14,6 +14,8 @@ namespace MultiWindow
 			internal uint msg;
 			internal int x;
 			internal int y;
+			internal int z;
+			internal int w;
 		}
 		[StructLayout( LayoutKind.Sequential)]
 		internal struct TPoint

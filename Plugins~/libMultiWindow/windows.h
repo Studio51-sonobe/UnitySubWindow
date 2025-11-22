@@ -16,6 +16,8 @@ struct TSubWindowEvent
     UINT msg;
     int x;
     int y;
+    int z;
+    int w;
 };
 struct TPoint
 {

@@ -148,6 +148,21 @@ LRESULT CALLBACK SubWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				//return HTCLIENT;
 				break;
 			}
+			case WM_KEYDOWN:
+			case WM_KEYUP:
+			case WM_CHAR:
+			case WM_IME_CHAR:
+			{
+				TSubWindowEvent ev;
+				ev.index = pWindow->index;
+				ev.msg = msg;
+				ev.x = wParam;
+				ev.y = 0;
+				ev.z = 0;
+				ev.w = 0;
+				pWindow->pCallback( ev);
+				break;
+			}
 			case WM_MOUSEMOVE:
 			case WM_LBUTTONDOWN:
 			case WM_LBUTTONUP:
@@ -161,6 +176,20 @@ LRESULT CALLBACK SubWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				ev.msg = msg;
 				ev.x = GET_X_LPARAM( lParam);
 				ev.y = GET_Y_LPARAM( lParam);
+				ev.z = 0;
+				ev.w = 0;
+				pWindow->pCallback( ev);
+				break;
+			}
+			case WM_MOUSEWHEEL:
+			{
+				TSubWindowEvent ev;
+				ev.index = pWindow->index;
+				ev.msg = msg;
+				ev.x = GET_X_LPARAM( lParam);
+				ev.y = GET_Y_LPARAM( lParam);
+				ev.z = GET_KEYSTATE_WPARAM( wParam);
+				ev.w = GET_WHEEL_DELTA_WPARAM( wParam);
 				pWindow->pCallback( ev);
 				break;
 			}

@@ -12,7 +12,6 @@ namespace MultiWindow
 			{
 				renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing
 			};
-			// m_Pass.ConfigureInput( ScriptableRenderPassInput.Color);
 		}
 		public override void AddRenderPasses( ScriptableRenderer renderer, ref RenderingData renderingData)
 		{
