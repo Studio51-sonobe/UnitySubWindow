@@ -11,25 +11,6 @@ namespace MultiWindow.EventSystems
 	[DisallowMultipleComponent]
 	public class EventSystem : UnityEngine.EventSystems.UIBehaviour
 	{
-	#if false
-		public static EventSystem current
-		{
-			get { return s_EventSystems.Count > 0 ? s_EventSystems[0] : null; }
-			set
-			{
-				int index = s_EventSystems.IndexOf( value);
-				if (index > 0)
-				{
-					s_EventSystems.RemoveAt( index);
-					s_EventSystems.Insert(0, value);
-				}
-				else if (index < 0)
-				{
-					Debug.LogError("Failed setting EventSystem.current to unknown EventSystem " + value);
-				}
-			}
-		}
-	#endif
 		public bool sendNavigationEvents
 		{
 			get { return m_sendNavigationEvents; }
@@ -68,6 +49,7 @@ namespace MultiWindow.EventSystems
 		public void UpdateModules()
 		{
 			GetComponents(m_SystemInputModules);
+			
 			var systemInputModulesCount = m_SystemInputModules.Count;
 			
 			for( int i = systemInputModulesCount - 1; i >= 0; i--)
@@ -181,7 +163,7 @@ namespace MultiWindow.EventSystems
 		public void RaycastAll( PointerEventData eventData, List<RaycastResult> raycastResults)
 		{
 			raycastResults.Clear();
-			var modules = RaycasterManager.GetRaycasters();
+			var modules = GetRaycasters();
 			var modulesCount = modules.Count;
 			
 			for (int i = 0; i < modulesCount; ++i)
@@ -204,96 +186,22 @@ namespace MultiWindow.EventSystems
 		{
 			return m_CurrentInputModule != null && m_CurrentInputModule.IsPointerOverGameObject( pointerId);
 		}
-	#if PACKAGE_UITOOLKIT
-		[SerializeField, HideInInspector]
-		private UIToolkitInteroperabilityBridge m_UIToolkitInterop = new ();
-		
-		internal UIToolkitInteroperabilityBridge uiToolkitInterop => m_UIToolkitInterop;
-	#endif
-		internal bool isOverridingUIToolkitEvents
-		{
-			get
-			{
-			#if PACKAGE_UITOOLKIT
-				return uiToolkitInterop.overrideUIToolkitEvents && UIDocument.EnabledDocumentCount > 0;
-			#else
-				return false;
-			#endif
-			}
-		}
-	#if PACKAGE_UITOOLKIT
-		private struct UIToolkitOverrideConfigOld
-		{
-			public EventSystem activeEventSystem;
-			public bool sendEvents;
-			public bool createPanelGameObjectsOnStart;
-		}
-		private static UIToolkitOverrideConfigOld? s_UIToolkitOverrideConfigOld = null;
-	#endif
-		[Obsolete("Use PanelInputConfiguration component instead.")]
-		public static void SetUITookitEventSystemOverride(EventSystem activeEventSystem, bool sendEvents = true, bool createPanelGameObjectsOnStart = true)
-		{
-		#if PACKAGE_UITOOLKIT
-			s_UIToolkitOverrideConfigOld = activeEventSystem == null && sendEvents && createPanelGameObjectsOnStart ? null : new UIToolkitOverrideConfigOld
-			{
-				activeEventSystem = activeEventSystem,
-				sendEvents = sendEvents,
-				createPanelGameObjectsOnStart = createPanelGameObjectsOnStart,
-			};
-			var eventSystem = activeEventSystem != null ? activeEventSystem : EventSystem.current;
-			
-			if (UIElementsRuntimeUtility.activeEventSystem != null && UIElementsRuntimeUtility.activeEventSystem != eventSystem)
-			{
-				((EventSystem)UIElementsRuntimeUtility.activeEventSystem).uiToolkitInterop.overrideUIToolkitEvents = false;
-			}
-			if (eventSystem != null && eventSystem.isActiveAndEnabled)
-			{
-				eventSystem.uiToolkitInterop.overrideUIToolkitEvents = sendEvents;
-				eventSystem.uiToolkitInterop.handlerTypes = createPanelGameObjectsOnStart ? (UIToolkitInteroperabilityBridge.EventHandlerTypes)~0 : 0;
-			}
-		#endif
-		}
 		protected override void OnEnable()
 		{
 			base.OnEnable();
-			s_EventSystems.Add(this);
-		#if PACKAGE_UITOOLKIT
-			if( s_UIToolkitOverrideConfigOld != null)
-			{
-				m_UIToolkitInterop = new();
-				
-				if (!s_UIToolkitOverrideConfigOld.Value.sendEvents)
-				{
-					m_UIToolkitInterop.overrideUIToolkitEvents = false;
-				}
-				if (!s_UIToolkitOverrideConfigOld.Value.createPanelGameObjectsOnStart)
-				{
-					m_UIToolkitInterop.handlerTypes = 0;
-				}
-			}
-			m_UIToolkitInterop.eventSystem = this;
-			m_UIToolkitInterop.OnEnable();
-		#endif
 		}
 		protected override void OnDisable()
 		{
-		#if PACKAGE_UITOOLKIT
-			m_UIToolkitInterop.OnDisable();
-		#endif
 			if (m_CurrentInputModule != null)
 			{
 				m_CurrentInputModule.DeactivateModule();
 				m_CurrentInputModule = null;
 			}
-			s_EventSystems.Remove(this);
 			base.OnDisable();
 		}
 		protected override void Start()
 		{
 			base.Start();
-		#if PACKAGE_UITOOLKIT
-			m_UIToolkitInterop.Start();
-		#endif
 		}
 		private void TickModules()
 		{
@@ -317,23 +225,14 @@ namespace MultiWindow.EventSystems
 		}
 		protected virtual void Update()
 		{
-		#if PACKAGE_UITOOLKIT
-			m_UIToolkitInterop.Update();
-		#endif
-		#if false
-			if (current != this)
-			{
-				return;
-			}
-		#endif
 			TickModules();
 			
 			bool changedModule = false;
 			var systemInputModulesCount = m_SystemInputModules.Count;
 			
-			for (var i = 0; i < systemInputModulesCount; i++)
+			for( int i0 = 0; i0 < systemInputModulesCount; ++i0)
 			{
-				var module = m_SystemInputModules[i];
+				var module = m_SystemInputModules[ i0];
 				if (module.IsModuleSupported() && module.ShouldActivateModule())
 				{
 					if (m_CurrentInputModule != module)
@@ -344,54 +243,36 @@ namespace MultiWindow.EventSystems
 					break;
 				}
 			}
-			if (m_CurrentInputModule == null)
+			if( m_CurrentInputModule == null)
 			{
-				for (var i = 0; i < systemInputModulesCount; i++)
+				for( int i0 = 0; i0 < systemInputModulesCount; ++i0)
 				{
-					var module = m_SystemInputModules[i];
-					if (module.IsModuleSupported())
+					var module = m_SystemInputModules[ i0];
+					
+					if( module.IsModuleSupported() != false)
 					{
-						ChangeEventModule(module);
+						ChangeEventModule( module);
 						changedModule = true;
 						break;
 					}
 				}
 			}
-			if (!changedModule && m_CurrentInputModule != null)
+			if( changedModule == false && m_CurrentInputModule != null)
 			{
 				m_CurrentInputModule.Process();
 			}
-	#if false
-		#if UNITY_EDITOR
-			if (Application.isPlaying)
-			{
-				int eventSystemCount = 0;
-				for (int i = 0; i < m_EventSystems.Count; i++)
-				{
-					if (m_EventSystems[i].GetType() == typeof(EventSystem))
-					{
-						eventSystemCount++;
-					}
-				}
-				if (eventSystemCount > 1)
-				{
-					Debug.LogWarning("There are " + eventSystemCount + " event systems in the scene. Please ensure there is always exactly one event system in the scene");
-				}
-			}
-		#endif
-	#endif
 		}
 		private void ChangeEventModule(BaseInputModule module)
 		{
-			if (m_CurrentInputModule == module)
+			if( m_CurrentInputModule == module)
 			{
 				return;
 			}
-			if (m_CurrentInputModule != null)
+			if( m_CurrentInputModule != null)
 			{
 				m_CurrentInputModule.DeactivateModule();
 			}
-			if (module != null)
+			if( module != null)
 			{
 				module.ActivateModule();
 			}
@@ -406,7 +287,6 @@ namespace MultiWindow.EventSystems
 			sb.AppendLine(m_CurrentInputModule != null ? m_CurrentInputModule.ToString() : "No module");
 			return sb.ToString();
 		}
-		static readonly List<EventSystem> s_EventSystems = new();
 		static readonly Comparison<RaycastResult> s_RaycastComparer = RaycastComparer;
 		
 		[SerializeField, FormerlySerializedAs( "m_Selected")]
@@ -421,6 +301,27 @@ namespace MultiWindow.EventSystems
 		BaseEventData m_DummyData;
 		GameObject m_CurrentSelected;
 		BaseInputModule m_CurrentInputModule;
-		List<BaseInputModule> m_SystemInputModules = new();
+		readonly List<BaseInputModule> m_SystemInputModules = new();
+		
+		internal void AddRaycaster( BaseRaycaster baseRaycaster)
+		{
+			if( m_Raycasters.Contains( baseRaycaster) == false)
+			{
+				m_Raycasters.Add( baseRaycaster);
+			}
+		}
+		internal void RemoveRaycasters( BaseRaycaster baseRaycaster)
+		{
+			if( m_Raycasters.Contains( baseRaycaster) != false)
+			{
+				m_Raycasters.Remove( baseRaycaster);
+			}
+		}
+		public List<BaseRaycaster> GetRaycasters()
+		{
+			return m_Raycasters;
+		}
+		readonly List<BaseRaycaster> m_Raycasters = new();
+		
 	}
 }

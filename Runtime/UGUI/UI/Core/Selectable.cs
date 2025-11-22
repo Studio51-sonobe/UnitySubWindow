@@ -370,17 +370,17 @@ namespace MultiWindow.UI
 			{
 				case Transition.ColorTint:
 				{
-					StartColorTween(Color.white, true);
+					StartColorTween( Color.white, true);
 					break;
 				}
 				case Transition.SpriteSwap:
 				{
-					DoSpriteSwap(null);
+					DoSpriteSwap( null);
 					break;
 				}
 				case Transition.Animation:
 				{
-					TriggerAnimation(triggerName);
+					TriggerAnimation( triggerName);
 					break;
 				}
 			}
@@ -492,9 +492,6 @@ namespace MultiWindow.UI
 					continue;
 				}
 			#if UNITY_EDITOR
-				// Apart from runtime use, FindSelectable is used by custom editors to
-				// draw arrows between different selectables. For scene view cameras,
-				// only selectables in the same stage should be considered.
 				if( Camera.current != null
 				&&	UnityEditor.SceneManagement.StageUtility.IsGameObjectRenderedByCamera( sel.gameObject, Camera.current) == false)
 				{

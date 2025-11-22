@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if false
+using System.Collections.Generic;
 
 namespace MultiWindow.EventSystems
 {
@@ -27,3 +28,4 @@ namespace MultiWindow.EventSystems
 		static readonly List<BaseRaycaster> s_Raycasters = new();
 	}
 }
+#endif

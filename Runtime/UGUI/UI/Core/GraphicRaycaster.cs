@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using MultiWindow.EventSystems;
+using MultiWindow.UI.Collections;
 
 namespace MultiWindow.UI
 {
@@ -86,7 +87,7 @@ namespace MultiWindow.UI
 			{
 				return;
 			}
-			var canvasGraphics = GraphicRegistry.GetRaycastableGraphicsForCanvas(canvas);
+			var canvasGraphics = GetRaycastableGraphicsForCanvas( canvas);
 			if (canvasGraphics == null || canvasGraphics.Count == 0)
 			{
 				return;
@@ -293,6 +294,150 @@ namespace MultiWindow.UI
 				results.Add(s_SortedGraphics[i]);
 			}
 			s_SortedGraphics.Clear();
+		}
+		
+		
+		
+		
+		static readonly List<Graphic> s_EmptyList = new();
+		readonly Dictionary<Canvas, IndexedSet<Graphic>> m_Graphics = new();
+		readonly Dictionary<Canvas, IndexedSet<Graphic>> m_RaycastableGraphics = new();
+		
+		public void RegisterGraphicForCanvas( Canvas c, Graphic graphic)
+		{
+			if( c == null || graphic == null)
+			{
+				return;
+			}
+			IndexedSet<Graphic> graphics;
+			m_Graphics.TryGetValue( c, out graphics);
+			
+			if (graphics != null)
+			{
+				graphics.AddUnique( graphic);
+				RegisterRaycastGraphicForCanvas( c, graphic);
+				return;
+			}
+			graphics = new IndexedSet<Graphic>
+			{
+				graphic
+			};
+			m_Graphics.Add( c, graphics);
+			RegisterRaycastGraphicForCanvas( c, graphic);
+		}
+		public void RegisterRaycastGraphicForCanvas( Canvas c, Graphic graphic)
+		{
+			if( c == null || graphic == null || !graphic.raycastTarget)
+			{
+				return;
+			}
+			IndexedSet<Graphic> graphics;
+			m_RaycastableGraphics.TryGetValue( c, out graphics);
+			
+			if( graphics != null)
+			{
+				graphics.AddUnique( graphic);
+				return;
+			}
+			graphics = new IndexedSet<Graphic>
+			{
+				graphic
+			};
+			m_RaycastableGraphics.Add( c, graphics);
+		}
+		public void UnregisterGraphicForCanvas( Canvas c, Graphic graphic)
+		{
+			if( c == null || graphic == null)
+			{
+				return;
+			}
+			IndexedSet<Graphic> graphics;
+			
+			if( m_Graphics.TryGetValue( c, out graphics))
+			{
+				graphics.Remove( graphic);
+				
+				if( graphics.Capacity == 0)
+				{
+					m_Graphics.Remove( c);
+				}
+				UnregisterRaycastGraphicForCanvas( c, graphic);
+			}
+		}
+		public void UnregisterRaycastGraphicForCanvas( Canvas c, Graphic graphic)
+		{
+			if( c == null || graphic == null)
+			{
+				return;
+			}
+			IndexedSet<Graphic> graphics;
+			
+			if( m_RaycastableGraphics.TryGetValue( c, out graphics))
+			{
+				graphics.Remove( graphic);
+				
+				if( graphics.Count == 0)
+				{
+					m_RaycastableGraphics.Remove( c);
+				}
+			}
+		}
+		public void DisableGraphicForCanvas( Canvas c, Graphic graphic)
+		{
+			if( c == null)
+			{
+				return;
+			}
+			IndexedSet<Graphic> graphics;
+			
+			if( m_Graphics.TryGetValue( c, out graphics))
+			{
+				graphics.DisableItem( graphic);
+				
+				if( graphics.Capacity == 0)
+				{
+					m_Graphics.Remove(　c);
+				}
+				DisableRaycastGraphicForCanvas( c, graphic);
+			}
+		}
+		public void DisableRaycastGraphicForCanvas( Canvas c, Graphic graphic)
+		{
+			if( c == null || !graphic.raycastTarget)
+			{
+				return;
+			}
+			IndexedSet<Graphic> graphics;
+			
+			if( m_RaycastableGraphics.TryGetValue( c, out graphics))
+			{
+				graphics.DisableItem(graphic);
+				
+				if( graphics.Capacity == 0)
+				{
+					m_RaycastableGraphics.Remove( c);
+				}
+			}
+		}
+		public IList<Graphic> GetGraphicsForCanvas( Canvas canvas)
+		{
+			IndexedSet<Graphic> graphics;
+			
+			if( m_Graphics.TryGetValue( canvas, out graphics))
+			{
+				return graphics;
+			}
+			return s_EmptyList;
+		}
+		public IList<Graphic> GetRaycastableGraphicsForCanvas( Canvas canvas)
+		{
+			IndexedSet<Graphic> graphics;
+			
+			if( m_RaycastableGraphics.TryGetValue( canvas, out graphics))
+			{
+				return graphics;
+			}
+			return s_EmptyList;
 		}
 	}
 }

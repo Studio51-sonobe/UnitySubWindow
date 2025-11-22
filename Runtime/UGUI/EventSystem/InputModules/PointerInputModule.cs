@@ -200,7 +200,7 @@ namespace MultiWindow.EventSystems
 		protected virtual MouseState GetMousePointerEventData(int id)
 		{
 			PointerEventData leftData;
-			var created = GetPointerData(kMouseLeftId, out leftData, true);
+			var created = GetPointerData( kMouseLeftId, out leftData, true);
 			
 			leftData.Reset();
 			

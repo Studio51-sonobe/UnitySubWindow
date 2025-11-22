@@ -11,14 +11,11 @@ using MultiWindow.UI.CoroutineTween;
 namespace MultiWindow.UI
 {
 	[DisallowMultipleComponent]
-	[RequireComponent(typeof(RectTransform))]
+	[RequireComponent( typeof( RectTransform))]
 	[ExecuteAlways]
 	public abstract class Graphic : UnityEngine.EventSystems.UIBehaviour, UnityEngine.UI.ICanvasElement
 	{
-		static protected Material s_DefaultUI = null;
-		static protected Texture2D s_WhiteTexture = null;
-		
-		static public Material defaultGraphicMaterial
+		public static Material defaultGraphicMaterial
 		{
 			get
 			{
@@ -29,25 +26,37 @@ namespace MultiWindow.UI
 				return s_DefaultUI;
 			}
 		}
-		[SerializeField, FormerlySerializedAs( "m_Mat")]
-		protected Material m_Material;
-		[SerializeField]
-		private Color m_Color = Color.white;
-		[NonSerialized]
-		protected bool m_SkipLayoutUpdate;
-		[NonSerialized]
-		protected bool m_SkipMaterialUpdate;
-		
+		public RectTransform rectTransform
+		{
+			get
+			{
+				if( ReferenceEquals(m_RectTransform, null))
+				{
+					m_RectTransform = GetComponent<RectTransform>();
+				}
+				return m_RectTransform;
+			}
+		}
+		public Canvas canvas
+		{
+			get
+			{
+				if( m_Canvas == null)
+				{
+					CacheCanvas();
+				}
+				return m_Canvas;
+			}
+		}
 		public virtual Color color
 		{
 			get { return m_Color; }
 			set { if (SetPropertyUtility.SetColor(ref m_Color, value)) SetVerticesDirty(); }
 		}
-		[SerializeField]
-		bool m_RaycastTarget = true;
-		
-		private bool m_RaycastTargetCache = true;
-		
+		public int depth
+		{
+			get { return canvasRenderer.absoluteDepth; }
+		}
 		public virtual bool raycastTarget
 		{
 			get{ return m_RaycastTarget; }
@@ -55,23 +64,20 @@ namespace MultiWindow.UI
 			{
 				if( value != m_RaycastTarget)
 				{
-					if (m_RaycastTarget)
+					if( m_RaycastTarget != false)
 					{
-						GraphicRegistry.UnregisterRaycastGraphicForCanvas(canvas, this);
+						GraphicRaycaster?.UnregisterRaycastGraphicForCanvas( canvas, this);
 					}
 					m_RaycastTarget = value;
 					
 					if( m_RaycastTarget && isActiveAndEnabled)
 					{
-						GraphicRegistry.RegisterRaycastGraphicForCanvas(canvas, this);
+						GraphicRaycaster?.RegisterRaycastGraphicForCanvas( canvas, this);
 					}
 				}
 				m_RaycastTargetCache = value;
 			}
 		}
-		[SerializeField]
-		private Vector4 m_RaycastPadding = new Vector4();
-		
 		public Vector4 raycastPadding
 		{
 			get { return m_RaycastPadding; }
@@ -80,48 +86,29 @@ namespace MultiWindow.UI
 				m_RaycastPadding = value;
 			}
 		}
-		[NonSerialized]
-		RectTransform m_RectTransform;
-		[NonSerialized]
-		CanvasRenderer m_CanvasRenderer;
-		[NonSerialized]
-		Canvas m_Canvas;
-		
-		[NonSerialized]
-		bool m_VertsDirty;
-		[NonSerialized]
-		bool m_MaterialDirty;
-		
-		[NonSerialized]
-		protected UnityAction m_OnDirtyLayoutCallback;
-		[NonSerialized]
-		protected UnityAction m_OnDirtyVertsCallback;
-		[NonSerialized]
-		protected UnityAction m_OnDirtyMaterialCallback;
-		
-		[NonSerialized]
-		protected static Mesh s_Mesh;
-		[NonSerialized]
-		static readonly UnityEngine.UI.VertexHelper s_VertexHelper = new();
-		
-		[NonSerialized]
-		protected Mesh m_CachedMesh;
-		[NonSerialized]
-		protected Vector2[] m_CachedUvs;
-		
-		[NonSerialized]
-		private readonly TweenRunner<ColorTween> m_ColorTweenRunner;
-		
 		protected bool useLegacyMeshGeneration
 		{
 			get;
 			set;
 		}
+		protected GraphicRaycaster GraphicRaycaster
+		{
+			get
+			{
+				if( m_GraphicRaycaster == null)
+				{
+					m_GraphicRaycaster = GetComponentInParent<GraphicRaycaster>();
+				}
+				return m_GraphicRaycaster;
+			}
+		}
 		protected Graphic()
 		{
-			if (m_ColorTweenRunner == null)
+			if( m_ColorTweenRunner == null)
+			{
 				m_ColorTweenRunner = new TweenRunner<ColorTween>();
-			m_ColorTweenRunner.Init(this);
+			}
+			m_ColorTweenRunner.Init( this);
 			useLegacyMeshGeneration = true;
 		}
 		public virtual void SetAllDirty()
@@ -190,20 +177,20 @@ namespace MultiWindow.UI
 		{
 			if( m_RaycastTargetCache != m_RaycastTarget)
 			{
-				if( m_RaycastTarget && isActiveAndEnabled)
+				if( m_RaycastTarget != false && isActiveAndEnabled != false)
 				{
-					GraphicRegistry.RegisterRaycastGraphicForCanvas( canvas, this);
+					GraphicRaycaster?.RegisterRaycastGraphicForCanvas( canvas, this);
 				}
-				else if( !m_RaycastTarget)
+				else if( m_RaycastTarget == false)
 				{
-					GraphicRegistry.UnregisterRaycastGraphicForCanvas( canvas, this);
+					GraphicRaycaster?.UnregisterRaycastGraphicForCanvas( canvas, this);
 				}
 			}
 			m_RaycastTargetCache = m_RaycastTarget;
 		}
 		protected override void OnRectTransformDimensionsChange()
 		{
-			if( gameObject.activeInHierarchy)
+			if( gameObject.activeInHierarchy != false)
 			{
 				if( UnityEngine.UI.CanvasUpdateRegistry.IsRebuildingLayout())
 				{
@@ -218,7 +205,7 @@ namespace MultiWindow.UI
 		}
 		protected override void OnBeforeTransformParentChanged()
 		{
-			GraphicRegistry.UnregisterGraphicForCanvas( canvas, this);
+			GraphicRaycaster?.UnregisterGraphicForCanvas( canvas, this);
 			UnityEngine.UI.LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
 		}
 		protected override void OnTransformParentChanged()
@@ -232,34 +219,8 @@ namespace MultiWindow.UI
 				return;
 			}
 			CacheCanvas();
-			GraphicRegistry.RegisterGraphicForCanvas(canvas, this);
+			GraphicRaycaster?.RegisterGraphicForCanvas( canvas, this);
 			SetAllDirty();
-		}
-		public int depth
-		{
-			get { return canvasRenderer.absoluteDepth; }
-		}
-		public RectTransform rectTransform
-		{
-			get
-			{
-				if( ReferenceEquals(m_RectTransform, null))
-				{
-					m_RectTransform = GetComponent<RectTransform>();
-				}
-				return m_RectTransform;
-			}
-		}
-		public Canvas canvas
-		{
-			get
-			{
-				if( m_Canvas == null)
-				{
-					CacheCanvas();
-				}
-				return m_Canvas;
-			}
 		}
 		private void CacheCanvas()
 		{
@@ -344,7 +305,7 @@ namespace MultiWindow.UI
 		{
 			base.OnEnable();
 			CacheCanvas();
-			GraphicRegistry.RegisterGraphicForCanvas(canvas, this);
+			GraphicRaycaster?.RegisterGraphicForCanvas( canvas, this);
 		#if UNITY_EDITOR
 			GraphicRebuildTracker.TrackGraphic(this);
 		#endif
@@ -359,7 +320,7 @@ namespace MultiWindow.UI
 		#if UNITY_EDITOR
 			GraphicRebuildTracker.UnTrackGraphic( this);
 		#endif
-			GraphicRegistry.DisableGraphicForCanvas( canvas, this);
+			GraphicRaycaster?.DisableGraphicForCanvas( canvas, this);
 			UnityEngine.UI.CanvasUpdateRegistry.DisableCanvasElementForRebuild( this);
 			
 			if (canvasRenderer != null)
@@ -374,7 +335,7 @@ namespace MultiWindow.UI
 		#if UNITY_EDITOR
 			GraphicRebuildTracker.UnTrackGraphic( this);
 		#endif
-			GraphicRegistry.UnregisterGraphicForCanvas( canvas, this);
+			GraphicRaycaster?.UnregisterGraphicForCanvas( canvas, this);
 			UnityEngine.UI.CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild( this);
 			
 			if( m_CachedMesh)
@@ -391,18 +352,18 @@ namespace MultiWindow.UI
 			
 			if( !IsActive())
 			{
-				GraphicRegistry.UnregisterGraphicForCanvas( currentCanvas, this);
+				GraphicRaycaster?.UnregisterGraphicForCanvas( currentCanvas, this);
 				return;
 			}
 			CacheCanvas();
 			
 			if( currentCanvas != m_Canvas)
 			{
-				GraphicRegistry.UnregisterGraphicForCanvas( currentCanvas, this);
+				GraphicRaycaster?.UnregisterGraphicForCanvas( currentCanvas, this);
 				
 				if (IsActive())
 				{
-					GraphicRegistry.RegisterGraphicForCanvas( canvas, this);
+					GraphicRaycaster?.RegisterGraphicForCanvas( canvas, this);
 				}
 			}
 		}
@@ -742,5 +703,57 @@ namespace MultiWindow.UI
 		{
 			m_OnDirtyMaterialCallback -= action;
 		}
+		static protected Material s_DefaultUI = null;
+		static protected Texture2D s_WhiteTexture = null;
+		
+		[SerializeField, FormerlySerializedAs( "m_Mat")]
+		protected Material m_Material;
+		[SerializeField]
+		private Color m_Color = Color.white;
+		[NonSerialized]
+		protected bool m_SkipLayoutUpdate;
+		[NonSerialized]
+		protected bool m_SkipMaterialUpdate;
+		[SerializeField]
+		bool m_RaycastTarget = true;
+		[SerializeField]
+		Vector4 m_RaycastPadding;
+		
+		[NonSerialized]
+		GraphicRaycaster m_GraphicRaycaster;
+		[NonSerialized]
+		bool m_RaycastTargetCache = true;
+		
+		[NonSerialized]
+		RectTransform m_RectTransform;
+		[NonSerialized]
+		CanvasRenderer m_CanvasRenderer;
+		[NonSerialized]
+		Canvas m_Canvas;
+		
+		[NonSerialized]
+		bool m_VertsDirty;
+		[NonSerialized]
+		bool m_MaterialDirty;
+		
+		[NonSerialized]
+		protected UnityAction m_OnDirtyLayoutCallback;
+		[NonSerialized]
+		protected UnityAction m_OnDirtyVertsCallback;
+		[NonSerialized]
+		protected UnityAction m_OnDirtyMaterialCallback;
+		
+		[NonSerialized]
+		protected static Mesh s_Mesh;
+		[NonSerialized]
+		static readonly UnityEngine.UI.VertexHelper s_VertexHelper = new();
+		
+		[NonSerialized]
+		protected Mesh m_CachedMesh;
+		[NonSerialized]
+		protected Vector2[] m_CachedUvs;
+		
+		[NonSerialized]
+		private readonly TweenRunner<ColorTween> m_ColorTweenRunner;
 	}
 }

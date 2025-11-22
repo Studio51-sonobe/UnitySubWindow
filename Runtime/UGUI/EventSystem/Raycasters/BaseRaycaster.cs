@@ -6,13 +6,13 @@ namespace MultiWindow.EventSystems
 {
 	public abstract class BaseRaycaster : UnityEngine.EventSystems.UIBehaviour
 	{
-		private BaseRaycaster m_RootRaycaster;
-		
 		public abstract void Raycast( PointerEventData eventData, List<RaycastResult> resultAppendList);
 		
-		public abstract Camera eventCamera { get; }
-		
-		[Obsolete("Please use sortOrderPriority and renderOrderPriority", false)]
+		public abstract Camera eventCamera
+		{
+			get;
+		}
+		[Obsolete( "Please use sortOrderPriority and renderOrderPriority", false)]
 		public virtual int priority
 		{
 			get { return 0; }
@@ -25,6 +25,17 @@ namespace MultiWindow.EventSystems
 		{
 			get { return int.MinValue; }
 		}
+		public EventSystem EventSystem
+		{
+			get
+			{
+				if( m_EventSystem == null)
+				{
+					m_EventSystem = GetComponentInParent<EventSystem>();
+				}
+				return m_EventSystem;
+			}
+		}
 		public BaseRaycaster rootRaycaster
 		{
 			get
@@ -33,7 +44,7 @@ namespace MultiWindow.EventSystems
 				{
 					var baseRaycasters = GetComponentsInParent<BaseRaycaster>();
 					
-					if (baseRaycasters.Length != 0)
+					if( baseRaycasters.Length != 0)
 					{
 						m_RootRaycaster = baseRaycasters[ baseRaycasters.Length - 1];
 					}
@@ -51,11 +62,11 @@ namespace MultiWindow.EventSystems
 		protected override void OnEnable()
 		{
 			base.OnEnable();
-			RaycasterManager.AddRaycaster( this);
+			EventSystem?.AddRaycaster( this);
 		}
 		protected override void OnDisable()
 		{
-			RaycasterManager.RemoveRaycasters( this);
+			EventSystem?.RemoveRaycasters( this);
 			base.OnDisable();
 		}
 		protected override void OnCanvasHierarchyChanged()
@@ -68,5 +79,7 @@ namespace MultiWindow.EventSystems
 			base.OnTransformParentChanged();
 			m_RootRaycaster = null;
 		}
+		EventSystem m_EventSystem;
+		BaseRaycaster m_RootRaycaster;
 	}
 }

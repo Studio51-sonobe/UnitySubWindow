@@ -1,4 +1,4 @@
-﻿
+﻿#if false
 using UnityEngine;
 using MultiWindow.UI.Collections;
 using System.Collections.Generic;
@@ -24,7 +24,6 @@ namespace MultiWindow.UI
 				return s_Instance;
 			}
 		}
-	#if true
 		public static void RegisterGraphicForCanvas( Canvas c, Graphic graphic)
 		{
 			if (c == null || graphic == null)
@@ -161,10 +160,10 @@ namespace MultiWindow.UI
 			}
 			return s_EmptyList;
 		}
-	#endif
 		static GraphicRegistry s_Instance;
 		static readonly List<Graphic> s_EmptyList = new();
 		readonly Dictionary<Canvas, IndexedSet<Graphic>> m_Graphics = new();
 		readonly Dictionary<Canvas, IndexedSet<Graphic>> m_RaycastableGraphics = new();
 	}
 }
+#endif
