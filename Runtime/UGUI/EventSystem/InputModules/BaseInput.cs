@@ -24,23 +24,53 @@ namespace MultiWindow.EventSystems
 		}
 		public virtual bool GetMouseButtonDown( int button)
 		{
+			if( m_Window != null)
+			{
+				return m_Window.GetMouseButtonDown( button);
+			}
 			return Input.GetMouseButtonDown( button);
 		}
 		public virtual bool GetMouseButtonUp( int button)
 		{
+			if( m_Window != null)
+			{
+				return m_Window.GetMouseButtonUp( button);
+			}
 			return Input.GetMouseButtonUp( button);
 		}
 		public virtual bool GetMouseButton( int button)
 		{
+			if( m_Window != null)
+			{
+				return m_Window.GetMouseButton( button);
+			}
 			return Input.GetMouseButton( button);
 		}
 		public virtual Vector2 mousePosition
 		{
-			get { return Input.mousePosition; }
+			get
+			{
+				if( m_Window != null)
+				{
+					Vector2 r = m_Window.GetMousePosition();
+					// Debug.LogError( $"!{r}, {gameObject.name}");
+					return r;
+				}
+				Vector2 ret = Input.mousePosition;
+				// Debug.LogError( $"#{ret}, {gameObject.name}");
+				return ret;
+			}
 		}
 		public virtual Vector2 mouseScrollDelta
 		{
-			get { return Input.mouseScrollDelta; }
+			get
+			{
+				if( m_Window != null)
+				{
+					return m_Window.GetMouseScrollDelta();
+				}
+				return Input.mouseScrollDelta;
+			}
 		}
 		public virtual float mouseScrollDeltaPerTick
 		{
@@ -66,5 +96,10 @@ namespace MultiWindow.EventSystems
 		{
 			return Input.GetButtonDown( buttonName);
 		}
+		internal void SetWindow( Window window)
+		{
+			m_Window = window;
+		}
+		Window m_Window;
 	}
 }

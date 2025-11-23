@@ -146,8 +146,8 @@ namespace MultiWindow.UI
 				graphic.canvasRenderer.SetAlpha(m_IsOn ? 1f : 0f);
 			}
 			else
-			{
 		#endif
+			{
 				graphic.CrossFadeAlpha( m_IsOn ? 1f : 0f, instant ? 0f : 0.1f, true);
 			}
 		}
