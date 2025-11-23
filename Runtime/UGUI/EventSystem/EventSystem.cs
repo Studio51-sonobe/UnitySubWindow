@@ -216,7 +216,7 @@ namespace MultiWindow.EventSystems
 		}
 		protected virtual void OnApplicationFocus(bool hasFocus)
 		{
-			m_HasFocus = hasFocus;
+			m_HasFocus = true; // hasFocus;
 			
 			if (!m_HasFocus)
 			{
