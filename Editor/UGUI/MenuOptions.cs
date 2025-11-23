@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using UnityEditor.SceneManagement;
 using UnityEditor.EventSystems;
@@ -24,12 +24,14 @@ namespace MultiWindow.UI.Eidtor
 			Scrollbar = 2025,
 			ScrollView = 2026,
 			ButtonPro = 2031,
+			DropdownPro = 2032,
+			InputFieldPro = 2033,
 			Canvas = 2060,
 			EventSystem = 2061,
 			Text = 2080,
 			ButtonLegacy = 2081,
-			Dropdown = 2082,
-			InputField = 2083,
+			DropdownLegacy = 2082,
+			InputFieldLegacy = 2083,
 		};
 		const string kUILayerName = "UI";
 		const string kStandardSpritePath       = "UI/Skin/UISprite.psd";
@@ -244,26 +246,28 @@ namespace MultiWindow.UI.Eidtor
 			}
 			PlaceUIElementRoot( go, menuCommand);
 		}
-/*
 		[MenuItem("GameObject/MultiWindowUI/Scrollbar", false, (int)MenuOptionsPriorityOrder.Scrollbar)]
 		static public void AddScrollbar(MenuCommand menuCommand)
 		{
 			GameObject go;
-			using (new FactorySwapToEditor())
-				go = DefaultControls.CreateScrollbar(GetStandardResources());
-			PlaceUIElementRoot(go, menuCommand);
+			
+			using( new FactorySwapToEditor())
+			{
+				go = DefaultControls.CreateScrollbar( GetStandardResources());
+			}
+			PlaceUIElementRoot( go, menuCommand);
 		}
-*/
-/*
 		[MenuItem("GameObject/MultiWindowUI/Scroll View", false, (int)MenuOptionsPriorityOrder.ScrollView)]
 		static public void AddScrollView(MenuCommand menuCommand)
 		{
 			GameObject go;
-			using (new FactorySwapToEditor())
-				go = DefaultControls.CreateScrollView(GetStandardResources());
-			PlaceUIElementRoot(go, menuCommand);
+			
+			using( new FactorySwapToEditor())
+			{
+				go = DefaultControls.CreateScrollView( GetStandardResources());
+			}
+			PlaceUIElementRoot( go, menuCommand);
 		}
-*/
 		[MenuItem("GameObject/MultiWindowUI/Canvas", false, (int)MenuOptionsPriorityOrder.Canvas)]
 		static public void AddCanvas(MenuCommand menuCommand)
 		{
@@ -302,26 +306,50 @@ namespace MultiWindow.UI.Eidtor
 			}
 			PlaceUIElementRoot( go, menuCommand);
 		}
-/*
-		[MenuItem("GameObject/MultiWindowUI/Legacy/Dropdown", false, (int)MenuOptionsPriorityOrder.Dropdown)]
-		static public void AddDropdown(MenuCommand menuCommand)
+		[MenuItem("GameObject/MultiWindowUI/Legacy/Dropdown", false, (int)MenuOptionsPriorityOrder.DropdownLegacy)]
+		static public void AddDropdownLegacy(MenuCommand menuCommand)
 		{
 			GameObject go;
-			using (new FactorySwapToEditor())
-				go = DefaultControls.CreateDropdown(GetStandardResources());
-			PlaceUIElementRoot(go, menuCommand);
+			
+			using( new FactorySwapToEditor())
+			{
+				go = DefaultControls.CreateDropdownLegacy( GetStandardResources());
+			}
+			PlaceUIElementRoot( go, menuCommand);
 		}
-*/
-/*
-		[MenuItem("GameObject/MultiWindowUI/Legacy/Input Field", false, (int)MenuOptionsPriorityOrder.InputField)]
-		public static void AddInputField(MenuCommand menuCommand)
+		[MenuItem("GameObject/MultiWindowUI/Dropdown - TextMeshPro", false, (int)MenuOptionsPriorityOrder.DropdownPro)]
+		static public void AddDropdownPro(MenuCommand menuCommand)
 		{
 			GameObject go;
-			using (new FactorySwapToEditor())
-				go = DefaultControls.CreateInputField(GetStandardResources());
-			PlaceUIElementRoot(go, menuCommand);
+			
+			using( new FactorySwapToEditor())
+			{
+				go = DefaultControls.CreateDropdownPro( GetStandardResources());
+			}
+			PlaceUIElementRoot( go, menuCommand);
 		}
-*/
+		[MenuItem("GameObject/MultiWindowUI/Legacy/Input Field", false, (int)MenuOptionsPriorityOrder.InputFieldLegacy)]
+		public static void AddInputFieldLegacy(MenuCommand menuCommand)
+		{
+			GameObject go;
+			
+			using (new FactorySwapToEditor())
+			{
+				go = DefaultControls.CreateInputFieldLegacy( GetStandardResources());
+			}
+			PlaceUIElementRoot( go, menuCommand);
+		}
+		[MenuItem("GameObject/MultiWindowUI/Input Field - TextMeshPro", false, (int)MenuOptionsPriorityOrder.InputFieldPro)]
+		public static void AddInputFieldPro(MenuCommand menuCommand)
+		{
+			GameObject go;
+			
+			using (new FactorySwapToEditor())
+			{
+				go = DefaultControls.CreateInputFieldPro( GetStandardResources());
+			}
+			PlaceUIElementRoot( go, menuCommand);
+		}
 		static public GameObject CreateNewUI()
 		{
 			var root = ObjectFactory.CreateGameObject( "Canvas", typeof(Canvas), typeof(UnityEngine.UI.CanvasScaler), typeof(GraphicRaycaster));

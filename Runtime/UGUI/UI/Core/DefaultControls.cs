@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -311,13 +311,12 @@ namespace MultiWindow.UI
 			labelRect.offsetMax     = new Vector2(-5f, -2f);
 			return toggleRoot;
 		}
-/*
-		public static GameObject CreateInputField(Resources resources)
+		public static GameObject CreateInputFieldLegacy(Resources resources)
 		{
 			GameObject root = CreateUIElementRoot("InputField (Legacy)", s_ThickElementSize, typeof(Image), typeof(InputField));
 
-			GameObject childPlaceholder = CreateUIObject("Placeholder", root, typeof(Text));
-			GameObject childText = CreateUIObject("Text (Legacy)", root, typeof(Text));
+			GameObject childPlaceholder = CreateUIObject("Placeholder", root, typeof(UnityEngine.UI.Text));
+			GameObject childText = CreateUIObject("Text (Legacy)", root, typeof(UnityEngine.UI.Text));
 
 			Image image = root.GetComponent<Image>();
 			image.sprite = resources.inputField;
@@ -327,12 +326,12 @@ namespace MultiWindow.UI
 			InputField inputField = root.GetComponent<InputField>();
 			SetDefaultColorTransitionValues(inputField);
 
-			Text text = childText.GetComponent<Text>();
+			UnityEngine.UI.Text text = childText.GetComponent<UnityEngine.UI.Text>();
 			text.text = "";
 			text.supportRichText = false;
 			SetDefaultTextValues(text);
 
-			Text placeholder = childPlaceholder.GetComponent<Text>();
+			UnityEngine.UI.Text placeholder = childPlaceholder.GetComponent<UnityEngine.UI.Text>();
 			placeholder.text = "Enter text...";
 			placeholder.fontStyle = FontStyle.Italic;
 			// Make placeholder color half as opaque as normal text color.
@@ -359,7 +358,75 @@ namespace MultiWindow.UI
 
 			return root;
 		}
-*/
+		public static GameObject CreateInputFieldPro(Resources resources)
+		{
+			GameObject root = CreateUIElementRoot("InputField (TMP)", s_ThickElementSize, typeof(Image), typeof(TMP_InputField));
+			GameObject textArea = CreateUIObject("Text Area", root, typeof(RectMask2D));
+			GameObject childPlaceholder = CreateUIObject("Placeholder", textArea, typeof(TMPro.TextMeshProUGUI), typeof(UnityEngine.UI.LayoutElement));
+			GameObject childText = CreateUIObject("Text", textArea, typeof( TMPro.TextMeshProUGUI));
+			
+			Image image = root.GetComponent<Image>();
+			image.sprite = resources.inputField;
+			image.type = Image.Type.Sliced;
+			image.color = s_DefaultSelectableColor;
+			
+			TMP_InputField inputField = root.GetComponent<TMP_InputField>();
+			SetDefaultColorTransitionValues(inputField);
+			
+			RectMask2D rectMask = textArea.GetComponent<RectMask2D>();
+			rectMask.padding = new Vector4(-8, -5, -8, -5);
+			
+			RectTransform textAreaRectTransform = textArea.GetComponent<RectTransform>();
+			textAreaRectTransform.anchorMin = Vector2.zero;
+			textAreaRectTransform.anchorMax = Vector2.one;
+			textAreaRectTransform.sizeDelta = Vector2.zero;
+			textAreaRectTransform.offsetMin = new Vector2(10, 6);
+			textAreaRectTransform.offsetMax = new Vector2(-10, -7);
+			
+			TMPro.TextMeshProUGUI text = childText.GetComponent<TMPro.TextMeshProUGUI>();
+			text.text = "";
+			text.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+			text.extraPadding = true;
+			text.richText = true;
+			SetDefaultTextValues(text);
+
+			TMPro.TextMeshProUGUI placeholder = childPlaceholder.GetComponent<TMPro.TextMeshProUGUI>();
+			placeholder.text = "Enter text...";
+			placeholder.fontSize = 14;
+			placeholder.fontStyle = TMPro.FontStyles.Italic;
+			placeholder.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+			placeholder.extraPadding = true;
+
+			// Make placeholder color half as opaque as normal text color.
+			Color placeholderColor = text.color;
+			placeholderColor.a *= 0.5f;
+			placeholder.color = placeholderColor;
+
+			// Add Layout component to placeholder.
+			UnityEngine.UI.LayoutElement placeholderLayout = childPlaceholder.GetComponent<UnityEngine.UI.LayoutElement>();
+			placeholderLayout.ignoreLayout = true;
+
+			RectTransform textRectTransform = childText.GetComponent<RectTransform>();
+			textRectTransform.anchorMin = Vector2.zero;
+			textRectTransform.anchorMax = Vector2.one;
+			textRectTransform.sizeDelta = Vector2.zero;
+			textRectTransform.offsetMin = new Vector2(0, 0);
+			textRectTransform.offsetMax = new Vector2(0, 0);
+
+			RectTransform placeholderRectTransform = childPlaceholder.GetComponent<RectTransform>();
+			placeholderRectTransform.anchorMin = Vector2.zero;
+			placeholderRectTransform.anchorMax = Vector2.one;
+			placeholderRectTransform.sizeDelta = Vector2.zero;
+			placeholderRectTransform.offsetMin = new Vector2(0, 0);
+			placeholderRectTransform.offsetMax = new Vector2(0, 0);
+
+			inputField.textViewport = textAreaRectTransform;
+			inputField.textComponent = text;
+			inputField.placeholder = placeholder;
+			inputField.fontAsset = text.font;
+
+			return root;
+		}
 		public static GameObject CreateDropdownLegacy(Resources resources)
 		{
 			GameObject root = CreateUIElementRoot("Dropdown (Legacy)", s_ThickElementSize, typeof(Image), typeof(Dropdown));
