@@ -22,11 +22,13 @@ namespace MultiWindow.EventSystems
 	}
 	public class BaseEventData : AbstractEventData
 	{
-		private readonly EventSystem m_EventSystem;
-		
 		public BaseEventData( EventSystem eventSystem)
 		{
 			m_EventSystem = eventSystem;
+		}
+		public EventSystem EventSystem
+		{
+			get{ return m_EventSystem; }
 		}
 		public BaseInputModule currentInputModule
 		{
@@ -37,5 +39,6 @@ namespace MultiWindow.EventSystems
 			get { return m_EventSystem.currentSelectedGameObject; }
 			set { m_EventSystem.SetSelectedGameObject( value, this); }
 		}
+		readonly EventSystem m_EventSystem;
 	}
 }

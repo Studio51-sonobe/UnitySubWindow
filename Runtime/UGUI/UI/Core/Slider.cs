@@ -6,7 +6,7 @@ using MultiWindow.EventSystems;
 
 namespace MultiWindow.UI
 {
-	[AddComponentMenu("MultiWindow/UI/Slider", 34)]
+	[AddComponentMenu("MultiWindowUI/Slider", 34)]
 	[ExecuteAlways]
 	[RequireComponent(typeof(RectTransform))]
 	public class Slider : Selectable, IDragHandler, IInitializePotentialDragHandler, UnityEngine.UI.ICanvasElement

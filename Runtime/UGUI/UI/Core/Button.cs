@@ -7,7 +7,7 @@ using MultiWindow.EventSystems;
 
 namespace MultiWindow.UI
 {
-	[AddComponentMenu( "MultiWindow/UI/Button", 30)]
+	[AddComponentMenu( "MultiWindowUI/Button", 30)]
 	public class Button : Selectable, IPointerClickHandler, ISubmitHandler
 	{
 		protected Button()

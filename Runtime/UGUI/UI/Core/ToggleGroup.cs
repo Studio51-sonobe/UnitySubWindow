@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MultiWindow.UI
 {
-	[AddComponentMenu("MultiWindow/UI/Toggle Group", 31)]
+	[AddComponentMenu("MultiWindowUI/Toggle Group", 31)]
 	[DisallowMultipleComponent]
 	public class ToggleGroup : UnityEngine.EventSystems.UIBehaviour
 	{

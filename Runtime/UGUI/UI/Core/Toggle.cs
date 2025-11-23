@@ -5,7 +5,7 @@ using MultiWindow.EventSystems;
 
 namespace MultiWindow.UI
 {
-	[AddComponentMenu("MultiWindow/UI/Toggle", 30)]
+	[AddComponentMenu("MultiWindowUI/Toggle", 30)]
 	[RequireComponent(typeof(RectTransform))]
 	public class Toggle : Selectable, IPointerClickHandler, ISubmitHandler, UnityEngine.UI.ICanvasElement
 	{

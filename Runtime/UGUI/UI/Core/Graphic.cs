@@ -575,7 +575,7 @@ namespace MultiWindow.UI
 					{
 						continue;
 					}
-					if (ignoreMasks && components[i] is UnityEngine.UI.Mask or UnityEngine.UI.RectMask2D)
+					if (ignoreMasks && components[i] is Mask or RectMask2D)
 					{
 						continue;
 					}

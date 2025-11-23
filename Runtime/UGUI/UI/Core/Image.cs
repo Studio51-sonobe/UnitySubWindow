@@ -13,7 +13,7 @@ namespace MultiWindow.UI
 	/// </summary>
 
 	[RequireComponent(typeof(CanvasRenderer))]
-	[AddComponentMenu("MultiWindow/UI/Image", 11)]
+	[AddComponentMenu("MultiWindowUI/Image", 11)]
 	/// <summary>
 	///   Displays a Sprite inside the UI System.
 	/// </summary>

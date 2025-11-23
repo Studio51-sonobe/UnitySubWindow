@@ -12,7 +12,7 @@ namespace MultiWindow.UI
 		[NonSerialized]
 		protected Material m_MaskMaterial;
 		[NonSerialized]
-		private UnityEngine.UI.RectMask2D m_ParentMask;
+		private RectMask2D m_ParentMask;
 		[SerializeField]
 		private bool m_Maskable = true;
 		
@@ -96,8 +96,8 @@ namespace MultiWindow.UI
 			{
 				if (maskable)
 				{
-					var rootCanvas = UnityEngine.UI.MaskUtilities.FindRootSortOverrideCanvas(transform);
-					m_StencilValue = UnityEngine.UI.MaskUtilities.GetStencilDepth(transform, rootCanvas);
+					var rootCanvas = MaskUtilities.FindRootSortOverrideCanvas(transform);
+					m_StencilValue = MaskUtilities.GetStencilDepth(transform, rootCanvas);
 				}
 				else
 					m_StencilValue = 0;
@@ -163,7 +163,7 @@ namespace MultiWindow.UI
 
 			if (isMaskingGraphic)
 			{
-				UnityEngine.UI.MaskUtilities.NotifyStencilStateChanged(this);
+				MaskUtilities.NotifyStencilStateChanged(this);
 			}
 		}
 
@@ -178,7 +178,7 @@ namespace MultiWindow.UI
 
 			if (isMaskingGraphic)
 			{
-				UnityEngine.UI.MaskUtilities.NotifyStencilStateChanged(this);
+				MaskUtilities.NotifyStencilStateChanged(this);
 			}
 		}
 
@@ -253,7 +253,7 @@ namespace MultiWindow.UI
 
 		private void UpdateClipParent()
 		{
-			var newParent = (maskable && IsActive()) ? UnityEngine.UI.MaskUtilities.GetRectMaskForClippable(this) : null;
+			var newParent = (maskable && IsActive()) ? MaskUtilities.GetRectMaskForClippable(this) : null;
 
 			// if the new parent is different OR is now inactive
 			if (m_ParentMask != null && (newParent != m_ParentMask || !newParent.IsActive()))

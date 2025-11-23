@@ -57,7 +57,7 @@ namespace MultiWindow.EventSystems
 		public bool fullyExited { get; set; }
 		public bool reentered { get; set; }
 		
-		public PointerEventData( EventSystem eventSystem) : base(eventSystem)
+		public PointerEventData( EventSystem eventSystem) : base( eventSystem)
 		{
 			eligibleForClick = false;
 			displayIndex = 0;

@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 namespace MultiWindow.UI
 {
-	[AddComponentMenu( "MultiWindow/UI/Selectable", 35)]
+	[AddComponentMenu( "MultiWindowUI/Selectable", 35)]
 	[ExecuteAlways]
 	[SelectionBase]
 	[DisallowMultipleComponent]
