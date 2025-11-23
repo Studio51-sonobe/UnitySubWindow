@@ -62,21 +62,32 @@ namespace MultiWindow.EventSystems
 		protected override void OnEnable()
 		{
 			base.OnEnable();
-			EventSystem?.AddRaycaster( this);
+			
+			if( m_EventSystem == null)
+			{
+				m_EventSystem = GetComponentInParent<EventSystem>();
+			}
+			m_EventSystem?.AddRaycaster( this);
 		}
 		protected override void OnDisable()
 		{
-			EventSystem?.RemoveRaycasters( this);
+			m_EventSystem?.RemoveRaycasters( this);
 			base.OnDisable();
 		}
 		protected override void OnCanvasHierarchyChanged()
 		{
 			base.OnCanvasHierarchyChanged();
+			m_EventSystem?.RemoveRaycasters( this);
+			m_EventSystem = GetComponentInParent<EventSystem>();
+			m_EventSystem?.AddRaycaster( this);
 			m_RootRaycaster = null;
 		}
 		protected override void OnTransformParentChanged()
 		{
 			base.OnTransformParentChanged();
+			m_EventSystem?.RemoveRaycasters( this);
+			m_EventSystem = GetComponentInParent<EventSystem>();
+			m_EventSystem?.AddRaycaster( this);
 			m_RootRaycaster = null;
 		}
 		EventSystem m_EventSystem;
