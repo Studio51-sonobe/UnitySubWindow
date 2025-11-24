@@ -7,6 +7,13 @@ namespace MultiWindow.EventSystems
 	[RequireComponent( typeof( EventSystem))]
 	public abstract class BaseInputModule : UnityEngine.EventSystems.UIBehaviour
 	{
+		internal void AddChar( char c) => m_Chars.Add( c);
+		internal void AddKeyUp( KeyCode c) => m_KeyUps.Add( c);
+		internal void AddKeyDown( KeyCode c) => m_KeyDowns.Add( c);
+		readonly List<char> m_Chars = new();
+		readonly List<KeyCode> m_KeyUps = new();
+		readonly List<KeyCode> m_KeyDowns = new();
+		
 		[NonSerialized]
 		protected List<RaycastResult> m_RaycastResultCache = new();
 		[SerializeField]

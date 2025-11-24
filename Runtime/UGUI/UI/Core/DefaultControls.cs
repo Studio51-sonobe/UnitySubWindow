@@ -122,6 +122,23 @@ namespace MultiWindow.UI
 			
 			return panelRoot;
 		}
+		public static GameObject CreateTextLegacy(Resources resources)
+		{
+			GameObject go = CreateUIElementRoot("Text (Legacy)", s_ThickElementSize, typeof(Text));
+			Text lbl = go.GetComponent<Text>();
+			lbl.text = "New Text";
+			SetDefaultTextValues(lbl);
+			
+			return go;
+		}
+		public static GameObject CreateTextPro(Resources resources)
+		{
+			GameObject go = CreateUIElementRoot("Text (Legacy)", s_ThickElementSize, typeof(TextMeshProUGUI));
+			TextMeshProUGUI lbl = go.GetComponent<TextMeshProUGUI>();
+			lbl.text = "New Text";
+			SetDefaultTextValues(lbl);
+			return go;
+		}
 		public static GameObject CreateButtonLegacy(Resources resources)
 		{
 			GameObject buttonRoot = CreateUIElementRoot("Button (Legacy)", s_ThickElementSize, typeof(Image), typeof(Button));
@@ -149,7 +166,7 @@ namespace MultiWindow.UI
 		public static GameObject CreateButtonPro(Resources resources)
 		{
 			GameObject buttonRoot = CreateUIElementRoot( "Button", s_ThickElementSize, typeof(Image), typeof(Button));
-			GameObject childText = CreateUIObject("Text (TMP)", buttonRoot, typeof(TMPro.TextMeshProUGUI));
+			GameObject childText = CreateUIObject("Text (TMP)", buttonRoot, typeof(TextMeshProUGUI));
 			
 			Image image = buttonRoot.GetComponent<Image>();
 			image.sprite = resources.standard;
@@ -159,7 +176,7 @@ namespace MultiWindow.UI
 			Button bt = buttonRoot.GetComponent<Button>();
 			SetDefaultColorTransitionValues(bt);
 			
-			TMPro.TextMeshProUGUI text = childText.GetComponent<TMPro.TextMeshProUGUI>();
+			TextMeshProUGUI text = childText.GetComponent<TextMeshProUGUI>();
 			text.text = "Button";
 			text.alignment = TMPro.TextAlignmentOptions.Center;
 			SetDefaultTextValues( text);
@@ -362,8 +379,8 @@ namespace MultiWindow.UI
 		{
 			GameObject root = CreateUIElementRoot("InputField (TMP)", s_ThickElementSize, typeof(Image), typeof(TMP_InputField));
 			GameObject textArea = CreateUIObject("Text Area", root, typeof(RectMask2D));
-			GameObject childPlaceholder = CreateUIObject("Placeholder", textArea, typeof(TMPro.TextMeshProUGUI), typeof(UnityEngine.UI.LayoutElement));
-			GameObject childText = CreateUIObject("Text", textArea, typeof( TMPro.TextMeshProUGUI));
+			GameObject childPlaceholder = CreateUIObject("Placeholder", textArea, typeof(TextMeshProUGUI), typeof(UnityEngine.UI.LayoutElement));
+			GameObject childText = CreateUIObject("Text", textArea, typeof( TextMeshProUGUI));
 			
 			Image image = root.GetComponent<Image>();
 			image.sprite = resources.inputField;
@@ -383,14 +400,14 @@ namespace MultiWindow.UI
 			textAreaRectTransform.offsetMin = new Vector2(10, 6);
 			textAreaRectTransform.offsetMax = new Vector2(-10, -7);
 			
-			TMPro.TextMeshProUGUI text = childText.GetComponent<TMPro.TextMeshProUGUI>();
+			TextMeshProUGUI text = childText.GetComponent<TextMeshProUGUI>();
 			text.text = "";
 			text.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
 			text.extraPadding = true;
 			text.richText = true;
 			SetDefaultTextValues(text);
 
-			TMPro.TextMeshProUGUI placeholder = childPlaceholder.GetComponent<TMPro.TextMeshProUGUI>();
+			TextMeshProUGUI placeholder = childPlaceholder.GetComponent<TextMeshProUGUI>();
 			placeholder.text = "Enter text...";
 			placeholder.fontSize = 14;
 			placeholder.fontStyle = TMPro.FontStyles.Italic;
@@ -573,7 +590,7 @@ namespace MultiWindow.UI
 		public static GameObject CreateDropdownPro(Resources resources)
 		{
 			GameObject root = CreateUIElementRoot("Dropdown", s_ThickElementSize, typeof(Image), typeof(TMP_Dropdown));
-			GameObject label = CreateUIObject("Label", root, typeof(TMPro.TextMeshProUGUI));
+			GameObject label = CreateUIObject("Label", root, typeof(TextMeshProUGUI));
 			GameObject arrow = CreateUIObject("Arrow", root, typeof(Image));
 			GameObject template = CreateUIObject("Template", root, typeof(Image), typeof(ScrollRect));
 			GameObject viewport = CreateUIObject("Viewport", template, typeof(Image), typeof(Mask));
@@ -581,7 +598,7 @@ namespace MultiWindow.UI
 			GameObject item = CreateUIObject("Item", content, typeof(Toggle));
 			GameObject itemBackground = CreateUIObject("Item Background", item, typeof(Image));
 			GameObject itemCheckmark = CreateUIObject("Item Checkmark", item, typeof(Image));
-			GameObject itemLabel = CreateUIObject("Item Label", item, typeof(TMPro.TextMeshProUGUI));
+			GameObject itemLabel = CreateUIObject("Item Label", item, typeof(TextMeshProUGUI));
 			
 			GameObject scrollbar = CreateScrollbar(resources);
 			scrollbar.name = "Scrollbar";
@@ -596,7 +613,7 @@ namespace MultiWindow.UI
 			vScrollbarRT.pivot = Vector2.one;
 			vScrollbarRT.sizeDelta = new Vector2(vScrollbarRT.sizeDelta.x, 0);
 			
-			TMPro.TextMeshProUGUI itemLabelText = itemLabel.GetComponent<TMPro.TextMeshProUGUI>();
+			TextMeshProUGUI itemLabelText = itemLabel.GetComponent<TextMeshProUGUI>();
 			SetDefaultTextValues(itemLabelText);
 			itemLabelText.alignment = TMPro.TextAlignmentOptions.Left;
 			
@@ -631,7 +648,7 @@ namespace MultiWindow.UI
 			viewportImage.sprite = resources.mask;
 			viewportImage.type = Image.Type.Sliced;
 			
-			TMPro.TextMeshProUGUI labelText = label.GetComponent<TMPro.TextMeshProUGUI>();
+			TextMeshProUGUI labelText = label.GetComponent<TextMeshProUGUI>();
 			SetDefaultTextValues(labelText);
 			labelText.alignment = TMPro.TextAlignmentOptions.Left;
 			

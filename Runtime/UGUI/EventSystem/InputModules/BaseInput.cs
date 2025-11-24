@@ -6,7 +6,15 @@ namespace MultiWindow.EventSystems
 	{
 		public virtual string compositionString
 		{
-			get { return Input.compositionString; }
+			get
+			{
+				var ret = Input.compositionString;
+				if( string.IsNullOrEmpty( ret) == false)
+				{
+					Debug.LogError( ret);
+				}
+				return ret;
+			}
 		}
 		public virtual IMECompositionMode imeCompositionMode
 		{
@@ -26,7 +34,9 @@ namespace MultiWindow.EventSystems
 		{
 			if( m_Window != null)
 			{
-				return m_Window.GetMouseButtonDown( button);
+				bool ret = m_Window.GetMouseButtonDown( button);
+				// Debug.LogError( $"{gameObject.name}: down = {ret}");
+				return ret;
 			}
 			return Input.GetMouseButtonDown( button);
 		}
@@ -34,7 +44,9 @@ namespace MultiWindow.EventSystems
 		{
 			if( m_Window != null)
 			{
-				return m_Window.GetMouseButtonUp( button);
+				bool ret = m_Window.GetMouseButtonUp( button);
+				// Debug.LogError( $"{gameObject.name}: up = {ret}");
+				return ret;
 			}
 			return Input.GetMouseButtonUp( button);
 		}
@@ -42,7 +54,9 @@ namespace MultiWindow.EventSystems
 		{
 			if( m_Window != null)
 			{
-				return m_Window.GetMouseButton( button);
+				bool ret = m_Window.GetMouseButton( button);
+				// Debug.LogError( $"{gameObject.name}: btn = {ret}");
+				return ret;
 			}
 			return Input.GetMouseButton( button);
 		}

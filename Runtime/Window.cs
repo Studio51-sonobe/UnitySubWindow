@@ -1,6 +1,6 @@
 ﻿
 using UnityEngine;
-using UnityEngine.UI;
+using System.Collections.Generic;
 
 namespace MultiWindow
 {
@@ -167,17 +167,17 @@ namespace MultiWindow
 					}
 					case 0x0100: /* WM_KEYDOWN */
 					{
-						// InjectKey( (KeyCode)ev.x, true);
+						m_InputModule?.AddKeyDown( GetKeyCode( ev.x));
 						break;
 					}
 					case 0x0101: /* WM_KEYUP */
 					{
-						// InjectKey( (KeyCode)ev.x, true);
+						m_InputModule?.AddKeyUp( GetKeyCode( ev.x));
 						break;
 					}
 					case 0x0102: /* WM_CHAR */
 					{
-						// InjectChar( (char)ev.x);
+						m_InputModule?.AddChar( (char)ev.x);
 						break;
 					}
 					case 0x0281: /* WM_IME_CHAR */
@@ -187,6 +187,50 @@ namespace MultiWindow
 					}
 				}
 			}
+		}
+		static KeyCode GetKeyCode( int vk)
+		{
+			return vk switch
+			{
+				0x08 => KeyCode.Backspace,
+				0x09 => KeyCode.Tab,
+				0x0D => KeyCode.Return,
+				0x10 => KeyCode.LeftShift,
+				0x25 => KeyCode.LeftArrow,
+				0x26 => KeyCode.UpArrow,
+				0x27 => KeyCode.RightArrow,
+				0x28 => KeyCode.DownArrow,
+				0x2E => KeyCode.Delete,
+				0x2A => KeyCode.Asterisk,
+				0x2B => KeyCode.Plus,
+				0x41 => KeyCode.A,
+				0x42 => KeyCode.B,
+				0x43 => KeyCode.C,
+				0x44 => KeyCode.D,
+				0x45 => KeyCode.E,
+				0x46 => KeyCode.F,
+				0x47 => KeyCode.G,
+				0x48 => KeyCode.H,
+				0x49 => KeyCode.I,
+				0x4A => KeyCode.J,
+				0x4B => KeyCode.K,
+				0x4C => KeyCode.L,
+				0x4D => KeyCode.M,
+				0x4E => KeyCode.N,
+				0x4F => KeyCode.O,
+				0x50 => KeyCode.P,
+				0x51 => KeyCode.Q,
+				0x52 => KeyCode.R,
+				0x53 => KeyCode.S,
+				0x54 => KeyCode.T,
+				0x55 => KeyCode.U,
+				0x56 => KeyCode.V,
+				0x57 => KeyCode.W,
+				0x58 => KeyCode.X,
+				0x59 => KeyCode.Y,
+				0x5A => KeyCode.Z,
+				_ => KeyCode.None,
+			};
 		}
 	#if !UNITY_EDITOR
 		void Reset()
