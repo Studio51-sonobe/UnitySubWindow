@@ -31,7 +31,7 @@ public class Example : MonoBehaviour
 		{
 			if( m_Window1.IsCreated == false)
 			{
-				m_Window1.Create();
+				m_Window1.Create( 512, 512);
 			}
 			else
 			{
@@ -42,7 +42,7 @@ public class Example : MonoBehaviour
 		{
 			if( m_Window2.IsCreated == false)
 			{
-				m_Window2.Create();
+				m_Window2.Create( 512 + 256, 512 + 256);
 			}
 			else
 			{

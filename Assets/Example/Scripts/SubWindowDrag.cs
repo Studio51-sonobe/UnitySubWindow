@@ -1,7 +1,7 @@
 
 using UnityEngine;
-using UnityEngine.EventSystems;
 using MultiWindow;
+using MultiWindow.EventSystems;
 
 public class SubWindowDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
@@ -9,6 +9,7 @@ public class SubWindowDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 	{
 		if( m_Window.TryGetPosition( out Vector2Int position) != false)
 		{
+			m_CursorPosition = Window.GetCursorPos();
 			m_WindowPosition = new Vector2( position.x, position.y);
 		}
 	}
@@ -16,12 +17,13 @@ public class SubWindowDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 	{
 		if( m_WindowPosition.HasValue != false)
 		{
-			m_WindowPosition = new Vector2(
-				m_WindowPosition.Value.x + eventData.delta.x,
-				m_WindowPosition.Value.y - eventData.delta.y);
+			Vector2 cursorDelta = Window.GetCursorPos() - m_CursorPosition;
+			Vector2 windowPosition = new(
+				m_WindowPosition.Value.x + cursorDelta.x,
+				m_WindowPosition.Value.y + cursorDelta.y);
 			m_Window.Move( 
-				(int)m_WindowPosition.Value.x, 
-				(int)m_WindowPosition.Value.y);
+				(int)windowPosition.x, 
+				(int)windowPosition.y);
 		}
 	}
 	public void OnEndDrag( PointerEventData eventData)
@@ -30,6 +32,8 @@ public class SubWindowDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
 	}
 	[SerializeField]
 	Window m_Window;
+	[System.NonSerialized]
+	Vector2 m_CursorPosition;
 	[System.NonSerialized]
 	Vector2? m_WindowPosition;
 }
