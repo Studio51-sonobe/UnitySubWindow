@@ -104,12 +104,13 @@ namespace MultiWindow.UI
 				displayIndex = currentEventCamera.targetDisplay;
 			}
 			Vector3 eventPosition = MultipleDisplayUtilities.GetRelativeMousePositionForRaycast( eventData);
-/*			
+			
+		#if UNITY_EDITOR
 			if ((int) eventPosition.z != displayIndex)
 			{
 				return;
 			}
-*/
+		#endif
 			Vector2 pos;
 			
 			if( currentEventCamera == null)

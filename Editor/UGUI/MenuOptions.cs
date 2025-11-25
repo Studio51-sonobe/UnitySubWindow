@@ -16,6 +16,7 @@ namespace MultiWindow.UI.Eidtor
 			Image = 2001,
 			RawImage = 2002,
 			Panel = 2003,
+			TextPro = 2004,
 			// 2020 - Button (TMP)
 			Toggle = 2021,
 			// 2022 - Dropdown (TMP)
@@ -28,7 +29,7 @@ namespace MultiWindow.UI.Eidtor
 			InputFieldPro = 2033,
 			Canvas = 2060,
 			EventSystem = 2061,
-			Text = 2080,
+			TextLegacy = 2080,
 			ButtonLegacy = 2081,
 			DropdownLegacy = 2082,
 			InputFieldLegacy = 2083,
@@ -283,6 +284,43 @@ namespace MultiWindow.UI.Eidtor
 				rect.sizeDelta = Vector2.zero;
 			}
 			Selection.activeGameObject = go;
+		}
+		[MenuItem("GameObject/MultiWindowUI/Text - TextMeshPro", false, (int)MenuOptionsPriorityOrder.TextPro)]
+		static void CreateTextMeshProGuiObjectPerform(MenuCommand menuCommand)
+		{
+			GameObject go = DefaultControls.CreateTextPro( GetStandardResources());
+			
+			TextMeshProUGUI textComponent = go.GetComponent<TextMeshProUGUI>();
+
+			// if( textComponent.m_isWaitingOnResourceLoad == false)
+			{
+				// Get reference to potential Presets for <TextMeshProUGUI> component
+				UnityEditor.Presets.Preset[] presets = UnityEditor.Presets.Preset.GetDefaultPresetsForObject(textComponent);
+
+				if (presets == null || presets.Length == 0)
+				{
+					textComponent.fontSize = TMPro.TMP_Settings.defaultFontSize;
+					textComponent.color = Color.white;
+					textComponent.text = "New Text";
+				}
+
+				if (TMPro.TMP_Settings.autoSizeTextContainer)
+				{
+					Vector2 size = textComponent.GetPreferredValues(TMPro.TMP_Math.FLOAT_MAX, TMPro.TMP_Math.FLOAT_MAX);
+					textComponent.rectTransform.sizeDelta = size;
+				}
+				else
+				{
+					textComponent.rectTransform.sizeDelta = TMPro.TMP_Settings.defaultTextMeshProUITextContainerSize;
+				}
+			}
+			// else
+			// {
+			// 	textComponent.fontSize = -99;
+			// 	textComponent.color = Color.white;
+			// 	textComponent.text = "New Text";
+			// }
+			PlaceUIElementRoot(go, menuCommand);
 		}
 		[MenuItem("GameObject/MultiWindowUI/Legacy/Button", false, (int)MenuOptionsPriorityOrder.ButtonLegacy)]
 		static public void AddButtonLegacy(MenuCommand menuCommand)
